@@ -17,6 +17,7 @@ import ManageUsers from "./components/Dashboard/Sidebar/ManageUsers/ManageUsers.
 import Reports from "./components/Dashboard/Sidebar/Reports/Reports.jsx";
 import UserSettings from "./components/Dashboard/Sidebar/UserSettings/UserSettings.jsx";
 import SchoolProfile from "./components/Dashboard/Sidebar/SchoolProfile/SchoolProfile.jsx";
+import UserRegistration from "./components/Dashboard/Sidebar/ManageUsers/UserRegistration.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -27,7 +28,8 @@ const router = createBrowserRouter(
         <Route path="school_profile" element={<SchoolProfile />} />
         <Route path="manage_users" element={<ManageUsers />} />
         <Route path="reports" element={<Reports />} />
-        <Route path="user_settings" element={<UserSettings />} />        
+        <Route path="user_settings" element={<UserSettings />} />
+        <Route path="new_user_registration" element={<UserRegistration />} />
       </Route>
     </Route>
   )

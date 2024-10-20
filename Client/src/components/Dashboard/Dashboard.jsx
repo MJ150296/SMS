@@ -1,7 +1,7 @@
 // src/components/Dashboard.js
 
 import React, { useEffect } from "react";
-import Header from "./Header";
+import Header from "./Header/Header";
 import Sidebar from "./Sidebar/Sidebar";
 import { Outlet } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";

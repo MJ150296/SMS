@@ -22,7 +22,7 @@ const uploadToCloudinary = async (filePath, folderPath) => {
 
     // Upload the file to Cloudinary
     const response = await cloudinary.uploader.upload(filePath, {
-      folder: folder, // You can specify any folder, default is 'avatars'
+      folder: folder, // You can specify any folder,
       resource_type: "auto", // Auto-detect file type
     });
 
@@ -41,3 +41,73 @@ const uploadToCloudinary = async (filePath, folderPath) => {
 };
 
 export { uploadToCloudinary };
+
+
+// const checkIfFolderAndImagesExist = async (folderPath) => {
+//   try {
+//     const folder = `SMS/${folderPath}`;
+
+//     // Use the Cloudinary Admin API to list resources in the folder
+//     const response = await cloudinary.api.resources({
+//       type: "upload",  // We are checking uploaded files
+//       prefix: folder,  // Folder path to search in
+//       resource_type: "image",  // Filter for image files
+//     });
+
+//     // Check if the folder contains any image resources
+//     if (response.resources && response.resources.length > 0) {
+//       console.log(`Folder '${folder}' exists and contains image files.`);
+
+//       // Delete the images if they exist
+//       await deleteImages(response.resources);
+//       console.log(`Images in folder '${folder}' have been deleted.`);
+      
+//       return {
+//         folderExists: true,
+//         hasImages: true,
+//       };
+//     } else {
+//       // If no images are found, the folder might still exist (but be empty)
+//       console.log(`Folder '${folder}' exists but does not contain any images.`);
+//       return {
+//         folderExists: true,
+//         hasImages: false,
+//       };
+//     }
+//   } catch (error) {
+//     if (error.http_code === 404) {
+//       // Cloudinary returns a 404 error if the folder or resources don't exist
+//       console.log(`Folder '${folder}' does not exist.`);
+//       return {
+//         folderExists: false,
+//         hasImages: false,
+//       };
+//     } else {
+//       console.error("Error checking Cloudinary folder:", error.message);
+//       return {
+//         folderExists: false,
+//         hasImages: false,
+//         error: error.message,
+//       };
+//     }
+//   }
+// };
+
+// // Function to delete images
+// const deleteImages = async (resources) => {
+//   try {
+//     const publicIds = resources.map((resource) => resource.public_id);
+
+//     // Use Cloudinary's destroy method to delete each image by public ID
+//     const deleteResponse = await cloudinary.api.delete_resources(publicIds, {
+//       resource_type: "image",  // Only delete images
+//     });
+
+//     console.log('Deleted images:', deleteResponse);
+//   } catch (error) {
+//     console.error('Error deleting images:', error.message);
+//   }
+// };
+
+// export { checkIfFolderAndImagesExist };
+

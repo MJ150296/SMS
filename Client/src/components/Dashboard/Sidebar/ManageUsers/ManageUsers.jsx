@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Table, Modal } from "antd"; // Still using Ant Design for table and modal
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
+import { NavLink } from "react-router-dom";
 
 const ManageUsers = () => {
   const [usersData, setUsersData] = useState([]);
@@ -54,7 +55,12 @@ const ManageUsers = () => {
     { title: "Full Name", dataIndex: "fullName", key: "fullName" },
     { title: "Email", dataIndex: "email", key: "email" },
     { title: "Role", dataIndex: "role", key: "role" },
-    { title: "Status", dataIndex: "isActive", key: "isActive", render: (isActive) => (isActive ? "Active" : "Inactive") },
+    {
+      title: "Status",
+      dataIndex: "isActive",
+      key: "isActive",
+      render: (isActive) => (isActive ? "Active" : "Inactive"),
+    },
     {
       title: "Action",
       key: "action",
@@ -73,12 +79,11 @@ const ManageUsers = () => {
     <div className="manage-users-dashboard p-4">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">Manage Users</h1>
-        <button
-          onClick={() => console.log("Add User")}
-          className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded shadow-lg"
-        >
+        <NavLink
+        to='/dashboard/new_user_registration'
+         className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded shadow-lg">
           + Add New User
-        </button>
+        </NavLink>
       </div>
 
       <div className="flex space-x-4 mb-4">
@@ -120,7 +125,8 @@ const ManageUsers = () => {
               <strong>Role:</strong> {selectedUser.role}
             </p>
             <p>
-              <strong>Status:</strong> {selectedUser.isActive ? "Active" : "Inactive"}
+              <strong>Status:</strong>{" "}
+              {selectedUser.isActive ? "Active" : "Inactive"}
             </p>
             <p>
               <strong>Contact:</strong> {selectedUser.contact}
