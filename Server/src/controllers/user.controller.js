@@ -223,7 +223,7 @@ const userProfileUpdate = asyncHandler(async (req, res) => {
     if (req.file) {
       const cloudinaryResult = await uploadToCloudinary(
         req.file.path,
-        `users/${fullName}/avatars`
+        `users/${fullName}/avatar`
       );
       if (!cloudinaryResult) {
         return res.status(400).json({ message: "Failed to upload avatar" });
