@@ -72,7 +72,10 @@ const schoolProfileUpdate = asyncHandler(async (req, res, next) => {
     let logoUrl = "";
     // Handle file upload for the logoUrl
     if (req.file) {
-      const cloudinaryResult = await uploadToCloudinary(req.file.path);
+      const cloudinaryResult = await uploadToCloudinary(
+        req.file.path,
+        `${name}/Logo`
+      );
       if (!cloudinaryResult) {
         return res.status(400).json({ message: "Failed to upload avatar" });
       }
@@ -120,11 +123,11 @@ const schoolProfileUpdate = asyncHandler(async (req, res, next) => {
       if (!school) {
         return res.status(404).json({ message: "School not found" });
       }
-    
+
       // Update the existing school profile using set and save
       school.set(sanitizedSchoolData); // Update fields in memory
       const updatedSchool = await school.save(); // Persist the changes to the database
-    
+
       console.log("Updated school", updatedSchool);
 
       if (!updatedSchool) {

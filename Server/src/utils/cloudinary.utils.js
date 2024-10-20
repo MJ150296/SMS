@@ -1,6 +1,6 @@
-import { v2 as cloudinary } from 'cloudinary';
-import fs from 'fs';
-import dotenv from 'dotenv';
+import { v2 as cloudinary } from "cloudinary";
+import fs from "fs";
+import dotenv from "dotenv";
 
 dotenv.config();
 
@@ -12,28 +12,30 @@ cloudinary.config({
 });
 
 // Function to upload a file to Cloudinary and delete local file after upload
-const uploadToCloudinary = async (filePath, folder = 'SMS/avatars') => {
+const uploadToCloudinary = async (filePath, folderPath) => {
   try {
     if (!filePath) {
-      throw new Error('File path is not valid.');
+      throw new Error("File path is not valid.");
     }
+
+    const folder = `SMS/${folderPath}`;
 
     // Upload the file to Cloudinary
     const response = await cloudinary.uploader.upload(filePath, {
       folder: folder, // You can specify any folder, default is 'avatars'
-      resource_type: 'auto', // Auto-detect file type
+      resource_type: "auto", // Auto-detect file type
     });
 
     // Delete the local file after successful upload
     fs.unlinkSync(filePath);
-    
+
     return response;
   } catch (error) {
     // Ensure local file is deleted even if an error occurs
     if (fs.existsSync(filePath)) {
       fs.unlinkSync(filePath);
     }
-    console.error('Error during Cloudinary upload:', error.message);
+    console.error("Error during Cloudinary upload:", error.message);
     return null;
   }
 };
