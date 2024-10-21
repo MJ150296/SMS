@@ -75,7 +75,7 @@ const loginUser = asyncHandler(async (req, res) => {
   }
 
   // 2. Find Super Admin by email
-  const user = await User.findOne({ email, role: "superAdmin" }); // Ensure it's a super admin
+  const user = await User.findOne({ email }); // Ensure it's a super admin
 
   if (!user) {
     throw new ApiError(401, "Invalid email or password");

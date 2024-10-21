@@ -31,9 +31,15 @@ export const updateSchoolProfile = createAsyncThunk(
       }
       // console.log("Here");
 
-      console.log(response.data.data.school);  
+      console.log(response.data.data.school);
 
-      return response?.data?.data?.school;   // because we are getting data.school in schoolProfile.jsx
+      const updatedSchool = response.data.data.school;
+
+      if (!updatedSchool) {
+        console.log("School not updated schoolProfileDataSlice");
+      }
+
+      return updatedSchool; // because we are getting data.school in schoolProfile.jsx
     } catch (error) {
       console.log("Error in school data slice");
       console.log(error);

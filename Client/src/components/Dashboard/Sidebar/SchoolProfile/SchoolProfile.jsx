@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchSchoolProfile, updateSchoolProfile } from "../../../../Redux/slices/schoolProfileDataSlice";
+import {
+  fetchSchoolProfile,
+  updateSchoolProfile,
+} from "../../../../Redux/slices/schoolProfileDataSlice";
 
 const SchoolProfile = () => {
   const dispatch = useDispatch();
@@ -18,7 +21,7 @@ const SchoolProfile = () => {
     reset,
     formState: { errors },
   } = useForm({
-    defaultValues: schoolProfile.schoolProfile || {}, // Set initial values when available
+    defaultValues: schoolProfile?.schoolProfile || {}, // Set initial values when available
   });
 
   const onSubmit = async (data) => {
@@ -55,7 +58,7 @@ const SchoolProfile = () => {
     if (!schoolProfile || !schoolProfile.schoolProfile) {
       dispatch(fetchSchoolProfile()); // Dispatch action to fetch profile data if it's not available
     }
-  }, [dispatch, schoolProfile]);
+  }, [schoolProfile]);
 
   const handleFileChange = (e) => {
     setLogoUrl(e.target.files[0]);
