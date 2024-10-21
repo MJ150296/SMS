@@ -1,78 +1,73 @@
 import mongoose from "mongoose";
+const { Schema } = mongoose;
 
-const studentSchema = new mongoose.Schema(
+// Define the Student schema
+const studentSchema = new Schema(
   {
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
+    userId: {
+      type: Schema.Types.ObjectId,
       ref: "User", // Reference to the User model
       required: true,
+      unique: true, // One-to-one relationship with the User model
     },
     studentId: {
       type: String,
       unique: true,
       required: true,
     },
-    grade: {
-      type: String,
+    classEnrolled: {
+      type: Schema.Types.ObjectId,
+      ref: "Class", // Reference to the Class model
       required: true,
     },
-    parentContact: {
-      father: {
-        name: String,
-        phone: String,
-        email: {
-          type: String,
-          match: [
-            /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(.\w{2,3})+$/,
-            "Please add a valid email address",
-          ],
-          required: false, // Email is optional
-        },
-      },
-      mother: {
-        name: String,
-        phone: String,
-        email: {
-          type: String,
-          match: [
-            /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(.\w{2,3})+$/,
-            "Please add a valid email address",
-          ],
-          required: false, // Email is optional
-        },
-      },
+    rollNumber: {
+      type: String, // Unique identifier for the student in the class
+      required: true,
+      unique: true,
     },
-    address: {
-      street: String,
-      city: String,
-      postalCode: String,
-      country: String,
-    },
-    enrollmentDate: {
+    dateOfBirth: {
       type: Date,
-      default: Date.now,
+      required: true,
     },
-    attendanceRecords: [
-      {
-        date: Date,
-        status: {
-          type: String,
-          enum: ["Present", "Absent", "Late", "Excused"],
-          default: "Present",
-        },
+    guardianDetails: {
+      fatherName: { type: String, trim: true },
+      motherName: { type: String, trim: true },
+      contactNumber: {
+        type: String,
+        trim: true,
+        match: [/^\d{10,15}$/, "Please provide a valid contact number"],
       },
-    ],
-    performance: {
-      grades: [
-        {
-          subject: String,
-          grade: String,
-          remarks: String,
-        },
-      ],
+      address: {
+        street: { type: String, trim: true },
+        city: { type: String, trim: true },
+        state: { type: String, trim: true },
+        postalCode: { type: String, trim: true },
+        country: { type: String, trim: true },
+      },
+    },
+    admissionDate: {
+      type: Date,
+      default: Date.now, // Date of admission
+    },
+    lastLogin: {
+      type: Date, // Track student's last login
+      default: null,
     },
   },
   { timestamps: true }
 );
 
-export const Student = mongoose.model("Student", studentSchema);
+// Pre-save hook for additional logic before saving, if necessary
+studentSchema.pre("save", async function (next) {
+  // Example: Add any pre-save logic here (e.g., validation, logging)
+  next();
+});
+
+// Virtual field to access the student's profile picture from the User model (if needed)
+studentSchema.virtual("profilePicture").get(function () {
+  return this.userId.avatarUrl; // Fetches avatar from linked User model
+});
+
+// Create and export the Student model
+const Student = mongoose.model("Student", studentSchema);
+export default Student;

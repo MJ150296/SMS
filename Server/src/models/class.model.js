@@ -29,6 +29,10 @@ const classSchema = new mongoose.Schema(
         },
       },
     ],
+    academicYear: {
+      type: String, // e.g., "2023-2024"
+      required: true,
+    },
   },
   { timestamps: true }
 );

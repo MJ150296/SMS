@@ -10,26 +10,11 @@ const adminSchema = new Schema(
       required: true,
       unique: true, // One-to-one relationship with the User model
     },
-    school: {
-      type: Schema.Types.ObjectId,
-      ref: "School", // Link the admin to a specific school
-      required: true,
-    },
     department: {
-      type: String, // Department the admin is responsible for (optional)
-      trim: true,
-      maxlength: [100, "Department name cannot exceed 100 characters"],
-    },
-    status: {
       type: String,
-      enum: ["active", "inactive", "suspended"],
-      default: "active",
-    },
-    phone: {
-      type: String,
+      enum: ["Admin Office", "Operations and Facilities", "IT and Technology"],
+      required: true,
       trim: true,
-      match: [/^\d{10,15}$/, "Please provide a valid phone number"], // Ensure phone number is valid
-      required: [true, "Phone number is required for admin"],
     },
     address: {
       street: { type: String, trim: true },
@@ -63,7 +48,6 @@ adminSchema.pre("save", async function (next) {
 adminSchema.virtual("profilePicture").get(function () {
   return this.userId.avatarUrl; // Fetches avatar from linked User model
 });
-
 
 // Create and export the Admin model
 const Admin = mongoose.model("Admin", adminSchema);

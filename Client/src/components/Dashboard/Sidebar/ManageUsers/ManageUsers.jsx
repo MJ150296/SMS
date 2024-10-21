@@ -3,8 +3,12 @@ import { Table, Modal } from "antd"; // Still using Ant Design for table and mod
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { NavLink } from "react-router-dom";
+import { fetchAllUsers } from "../../../../Redux/slices/allUsersSlice.js";
 
 const ManageUsers = () => {
+  const dispatch = useDispatch();
+  // dispatch(fetchAllUsers()); // To update the All user Info
+
   const [usersData, setUsersData] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -80,8 +84,9 @@ const ManageUsers = () => {
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">Manage Users</h1>
         <NavLink
-        to='/dashboard/new_user_registration'
-         className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded shadow-lg">
+          to="/dashboard/new_user_registration"
+          className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded shadow-lg"
+        >
           + Add New User
         </NavLink>
       </div>
@@ -100,11 +105,21 @@ const ManageUsers = () => {
           onChange={(e) => handleFilter(e.target.value)}
         >
           <option value="All">All</option>
-          <option value="Admin">Admin</option>
-          <option value="Teacher">Teacher</option>
-          <option value="Student">Student</option>
+          <option value="admin">Admin</option>
+          <option value="teacher">Teacher</option>
+          <option value="student">Student</option>
           <option value="superAdmin">Super Admin</option>
         </select>
+
+        <button
+          onClick={() => {
+            console.log("clicked");
+
+            dispatch(fetchAllUsers()); // To update the All user Info
+          }}
+        >
+          Refresh
+        </button>
       </div>
 
       <Table columns={columns} dataSource={filteredUsers} rowKey="_id" />

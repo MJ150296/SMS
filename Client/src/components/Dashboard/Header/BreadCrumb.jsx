@@ -13,7 +13,7 @@ function BreadCrumb() {
     "/dashboard/manage_users": "ManageUsers",
     "/dashboard/reports": "Reports",
     "/dashboard/user_settings": "UserSettings",
-    "/dashboard/new_user_registration": "UserRegistration",
+    "/dashboard/new_user_registration": "User Registration",
     "/dashboard/user_statistics": "UserStatistics",
   };
 
