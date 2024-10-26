@@ -120,9 +120,9 @@ const registerStudent = asyncHandler(async (req, res) => {
     email,
     password,
     classEnrolled,
+    section, //  section is being sent from the frontend
     dateOfBirth,
     guardianDetails,
-    section, //  section is being sent from the frontend
     academicYear, // academicYear is sent too
   } = req.body;
 
@@ -136,15 +136,28 @@ const registerStudent = asyncHandler(async (req, res) => {
     }
 
     // 2. Check if the class exists
-    let classRecord = await Class.findOne({ className: classEnrolled });
+    let classRecord = await Class.findOne({
+      className: classEnrolled,
+      section: section,
+    });
 
-    // 3. If the class doesn't exist, create a new class
+    // 3. If the class doesn't exist, create a new class and assign a CLass Teacher to the class
     if (!classRecord) {
+      // Fetch the first teacher
+      const firstTeacher = await Teacher.findOne({}).sort({ createdAt: 1 }); // Get the first teacher based on creation date
+
+      if (!firstTeacher) {
+        return res
+          .status(400)
+          .json({ message: "No teachers available to assign." });
+      }
+
       classRecord = await Class.create({
         className: classEnrolled, // Assuming you're passing a className or ID in classEnrolled
-        section: section || "A", // You can adjust the section logic
+        section: section, // You can adjust the section logic
         academicYear: academicYear || "2023-2024", // Default academic year if not provided
         students: [], // Start with an empty student array
+        classTeacher: firstTeacher._id, // Assign the first teacher as the class teacher
       });
     }
 
@@ -161,13 +174,19 @@ const registerStudent = asyncHandler(async (req, res) => {
       throw new ApiError(400, "A student with these details already exists.");
     }
 
-    //Count the number of students already enrolled in the class
-    const studentCount = await Student.countDocuments({
-      classEnrolled: classRecord._id,
-    });
+    // Find the highest existing roll number in the class
+    const highestRollNumber = await Student.findOne(
+      {
+        classEnrolled: classRecord._id,
+        section: section || classRecord.section, // Also filter by section
+      },
+      { rollNumber: 1 }
+    ).sort({ rollNumber: -1 });
 
-    //  Assign the next roll number as count + 1
-    const rollNumber = `${studentCount + 1}`; // Roll number will be a string representing the next available number
+    // If a highest roll number exists, increment it; otherwise, start at 1
+    const rollNumber = highestRollNumber
+      ? `${parseInt(highestRollNumber.rollNumber) + 1}`
+      : `${parseInt("1")}`;
 
     // 5. Create a new User record
     const user = await User.create({
@@ -184,6 +203,7 @@ const registerStudent = asyncHandler(async (req, res) => {
       userId: user._id, // Link the student to the created user
       studentId,
       classEnrolled: classRecord._id,
+      section: section || classRecord.section, // Ensure the section is stored in the student document
       rollNumber,
       dateOfBirth,
       guardianDetails: {
@@ -203,8 +223,7 @@ const registerStudent = asyncHandler(async (req, res) => {
     classRecord.students.push(student._id);
     await classRecord.save();
 
-    console.log("Student Created",student);
-    
+    console.log("Student Created", student);
 
     // 9. Return success response
     return res.status(201).json(
@@ -236,5 +255,6 @@ const registerStudent = asyncHandler(async (req, res) => {
     );
   }
 });
+
 
 export { registerAdmin, registerTeacher, registerStudent };

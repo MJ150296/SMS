@@ -1,19 +1,26 @@
 // src/components/Dashboard.js
 
-import React, { useEffect } from "react";
+import React, { createContext, useEffect, useState } from "react";
 import Header from "./Header/Header";
 import Sidebar from "./Sidebar/Sidebar";
 import { Outlet } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAllUsers } from "../../Redux/slices/allUsersSlice";
+import { fetchAllUsers } from "../../Redux/slices/allUsersSlice.js";
+import { fetchAllStudents } from "../../Redux/slices/allStudentSlice.js";
+import { fetchAllClasses } from "../../Redux/slices/classSlice.js";
+import { fetchAllTeachers } from "../../Redux/slices/allTeacherSlice.js";
+import { fetchAllAdmins } from "../../Redux/slices/allAdminSlice.js";
 
 const Dashboard = () => {
   const dispatch = useDispatch();
 
   const { users, isLoading, error } = useSelector((state) => state.allUsers);
-
   useEffect(() => {
+    dispatch(fetchAllStudents());
+    dispatch(fetchAllClasses());
     dispatch(fetchAllUsers());
+    dispatch(fetchAllTeachers());
+    dispatch(fetchAllAdmins());
   }, [dispatch]);
 
   useEffect(() => {
@@ -29,7 +36,7 @@ const Dashboard = () => {
         <Header />
         <div className="p-4">
           <Outlet />
-          {/* You can add more components here like charts, tables, etc. */}
+          {/* First Page is UserStatistics */}
         </div>
       </div>
     </div>

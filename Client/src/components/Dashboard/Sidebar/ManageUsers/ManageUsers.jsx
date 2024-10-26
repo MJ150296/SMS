@@ -144,7 +144,7 @@ const ManageUsers = () => {
               {selectedUser.isActive ? "Active" : "Inactive"}
             </p>
             <p>
-              <strong>Contact:</strong> {selectedUser.contact}
+              <strong>Contact:</strong> {selectedUser.contactNumber}
             </p>
             <button
               onClick={() => console.log("Edit User")}

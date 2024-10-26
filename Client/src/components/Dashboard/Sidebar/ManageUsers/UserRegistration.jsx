@@ -13,8 +13,8 @@ const UserRegistrationForm = () => {
     watch,
     formState: { errors },
   } = useForm();
-  const role = watch("role", "student"); // Watch the role field
-
+  const role = watch("role", "student"); // Watch the role field, Whose input fields will be
+  //  displayed in the default form
   const onSubmit = async (data) => {
     try {
       let response;
@@ -39,6 +39,7 @@ const UserRegistrationForm = () => {
           email: data.email,
           password: data.password,
           classEnrolled: data.classEnrolled,
+          section: data.section,
           dateOfBirth: data.dateOfBirth,
           guardianDetails: {
             fatherName: data.guardianDetails.fatherName,
@@ -128,8 +129,8 @@ const UserRegistrationForm = () => {
             className="w-full p-2 border border-gray-300 rounded"
           >
             <option value="student">Student</option>
-            <option value="teacher">Teacher</option>
             <option value="admin">Admin</option>
+            <option value="teacher">Teacher</option>
           </select>
         </div>
 
@@ -167,6 +168,7 @@ const UserRegistrationForm = () => {
                   {...register("section", {
                     required: "Section is required",
                   })}
+                  defaultValue="A"
                   className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="">Select Section</option>
@@ -207,6 +209,7 @@ const UserRegistrationForm = () => {
                 {...register("dateOfBirth", {
                   required: "Date of Birth is required",
                 })}
+                defaultValue="2000-01-01" // Setting the default value to January 1, 2000
                 className="w-full p-2 border border-gray-300 rounded"
               />
               {errors.dateOfBirth && (
@@ -223,6 +226,7 @@ const UserRegistrationForm = () => {
                 type="text"
                 {...register("guardianDetails.fatherName", {
                   required: "Father's Name is required",
+                  value: "Mayank Joshi",
                 })}
                 className="w-full p-2 border border-gray-300 rounded"
               />
@@ -239,6 +243,7 @@ const UserRegistrationForm = () => {
                 type="text"
                 {...register("guardianDetails.motherName", {
                   required: "Mother's Name is required",
+                  value: "Mayank Joshi",
                 })}
                 className="w-full p-2 border border-gray-300 rounded"
               />
@@ -261,6 +266,7 @@ const UserRegistrationForm = () => {
                     value: /^\d{10,15}$/,
                     message: "Please provide a valid contact number",
                   },
+                  value: "07895927366",
                 })}
                 className="w-full p-2 border border-gray-300 rounded"
               />
@@ -278,6 +284,7 @@ const UserRegistrationForm = () => {
                 type="text"
                 {...register("guardianDetails.address.street", {
                   required: "Street is required",
+                  value: "abc",
                 })}
                 className="w-full p-2 border border-gray-300 rounded"
               />
@@ -294,6 +301,7 @@ const UserRegistrationForm = () => {
                 type="text"
                 {...register("guardianDetails.address.city", {
                   required: "City is required",
+                  value: "xyz",
                 })}
                 className="w-full p-2 border border-gray-300 rounded"
               />
@@ -310,6 +318,7 @@ const UserRegistrationForm = () => {
                 type="text"
                 {...register("guardianDetails.address.state", {
                   required: "State is required",
+                  value: "jkl",
                 })}
                 className="w-full p-2 border border-gray-300 rounded"
               />
@@ -326,6 +335,7 @@ const UserRegistrationForm = () => {
                 type="text"
                 {...register("guardianDetails.address.postalCode", {
                   required: "Postal Code is required",
+                  value: "201009",
                 })}
                 className="w-full p-2 border border-gray-300 rounded"
               />

@@ -20,10 +20,13 @@ const studentSchema = new Schema(
       ref: "Class", // Reference to the Class model
       required: true,
     },
-    rollNumber: {
-      type: String, // Unique identifier for the student in the class
+    section: {
+      type: String, // default A is coming from userRegister.controller.js
       required: true,
-      unique: true,
+    },
+    rollNumber: {
+      type: Number, // Unique identifier for the student in the class
+      required: true,
     },
     dateOfBirth: {
       type: Date,
@@ -55,6 +58,12 @@ const studentSchema = new Schema(
     },
   },
   { timestamps: true }
+);
+
+// Compound unique index on classEnrolled and rollNumber
+studentSchema.index(
+  { classEnrolled: 1, section: 1, rollNumber: 1 },
+  { unique: true }
 );
 
 // Pre-save hook for additional logic before saving, if necessary

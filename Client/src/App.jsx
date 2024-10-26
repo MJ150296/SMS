@@ -4,6 +4,8 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { fetchSchoolProfile } from "./Redux/slices/schoolProfileDataSlice.js";
 import Loading from "./components/Loading.jsx";
 import "animate.css";
+import "../src/assets/Chart JS imports/ChartJS.register.js"
+
 
 function App() {
   const [welcomeScreenEnds, setWelcomeScreenEnds] = useState(false);

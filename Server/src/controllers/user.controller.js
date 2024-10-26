@@ -216,14 +216,18 @@ const getAllUserData = asyncHandler(async (req, res) => {
 const userProfileUpdate = asyncHandler(async (req, res) => {
   try {
     const userId = req.user._id; // Assuming user ID is obtained from JWT verification middleware
+
     const { fullName, email, contactNumber } = req.body; // Update to use contactNumber
     let avatarUrl;
+
+    // Find user by ID and update the profile
+    const user = await User.findById(userId);
 
     // Check if the request contains a file (avatar upload)
     if (req.file) {
       const cloudinaryResult = await uploadToCloudinary(
         req.file.path,
-        `users/${fullName}/avatar`
+        `users/avatar/${user.role}/${fullName}`
       );
       if (!cloudinaryResult) {
         return res.status(400).json({ message: "Failed to upload avatar" });
@@ -231,16 +235,18 @@ const userProfileUpdate = asyncHandler(async (req, res) => {
       avatarUrl = cloudinaryResult.secure_url; // Get the avatar URL from Cloudinary
     }
 
-    // Find user by ID and update the profile
-    const user = await User.findById(userId);
-
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
     // Restrict updates for students, allow only password reset
-    if (user.role === "student" && req.body.password) {
-      user.password = req.body.password; // Password reset for students
+    if (user.role === "student") {
+      if (req.body.password) {
+        user.password = req.body.password; // Password reset for students
+      }
+      if (avatarUrl) {
+        user.avatarUrl = avatarUrl;
+      }
     } else if (user.role !== "student") {
       // Allow profile updates for non-students
       if (fullName) user.fullName = fullName;
