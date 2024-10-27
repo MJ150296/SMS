@@ -40,6 +40,12 @@ const Sidebar = () => {
               Reports
             </NavLink>
             <NavLink
+              to="/dashboard/attendance"
+              className="block px-4 py-2 hover:bg-gray-700"
+            >
+              Attendance
+            </NavLink>
+            <NavLink
               to="/dashboard/events"
               className="block px-4 py-2 hover:bg-gray-700"
             >
@@ -67,6 +73,12 @@ const Sidebar = () => {
               className="block px-4 py-2 hover:bg-gray-700"
             >
               Dashboard
+            </NavLink>
+            <NavLink
+              to="/dashboard/attendance"
+              className="block px-4 py-2 hover:bg-gray-700"
+            >
+              Attendance
             </NavLink>
             <NavLink
               to="/dashboard/manage_users"

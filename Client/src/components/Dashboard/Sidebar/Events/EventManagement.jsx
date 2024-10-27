@@ -44,6 +44,35 @@ const EventManagement = () => {
   const [activeEvents, setActiveEvents] = useState();
 
   const [pastEvents, setPastEvents] = useState();
+  const [isEventUpdated, setIsEventUpdated] = useState(false);
+
+  useEffect(() => {
+    if (events) {
+      const upcomingEvents = events.filter((event) =>
+        dayjs().isBefore(event.startDate)
+      );
+
+      const pastEvents = events.filter((event) =>
+        dayjs().isAfter(event.endDate)
+      );
+
+      const activeEvents = events.filter(
+        (event) =>
+          dayjs().isAfter(event.startDate) && dayjs().isBefore(event.endDate)
+      );
+
+      setUpcomingEvents(upcomingEvents);
+      setActiveEvents(activeEvents);
+      setPastEvents(pastEvents);
+    }
+  }, [events]);
+
+  // useEffect(() => {
+  //   if (isEventUpdated) {
+  //     setIsEventUpdated(false);
+  //     dispatch(fetchEvents());
+  //   }
+  // }, [isEventUpdated, events]);
 
   const onSubmit = (data) => {
     // Format the start and end dates before pushing them into newEvents
@@ -69,31 +98,9 @@ const EventManagement = () => {
         isRecurring: false,
       };
 
-      dispatch(addEvent(newEvent));
+      dispatch(addEvent(newEvent)).then(() => dispatch(fetchEvents()));
     }
   };
-
-  useEffect(() => {
-    if (events) {
-      const upcomingEvents = events.filter((event) =>
-        dayjs().isBefore(event.startDate)
-      );
-
-      const pastEvents = events.filter((event) =>
-        dayjs().isAfter(event.endDate)
-      );
-
-      const activeEvents = events.filter(
-        (event) =>
-          dayjs().isAfter(event.startDate) && dayjs().isBefore(event.endDate)
-      );
-
-      setUpcomingEvents(upcomingEvents);
-      setActiveEvents(activeEvents);
-      setPastEvents(pastEvents);
-    }
-    dispatch(fetchEvents());
-  }, [events]);
 
   const createRecurringEvents = (data) => {
     const occurrences = [];
@@ -158,7 +165,7 @@ const EventManagement = () => {
         recurringCount: data.recurringCount,
       });
     }
-    dispatch(addEvent(occurrences));
+    dispatch(addEvent(occurrences)).then(() => dispatch(fetchEvents()));
   };
 
   const showEventDetails = (event) => {
@@ -251,7 +258,7 @@ const EventManagement = () => {
                 control={control}
                 render={({ field }) => (
                   <Select {...field} placeholder="Select Recurring Type">
-                    <Select.Option value="daily">Daily</Select.Option>
+                    {/* <Select.Option value="daily">Daily</Select.Option> */}
                     <Select.Option value="weekly">Weekly</Select.Option>
                     <Select.Option value="monthly">Monthly</Select.Option>
                   </Select>
@@ -434,7 +441,7 @@ const EventManagement = () => {
                 <Select.Option value="Extracurricular">
                   Extracurricular
                 </Select.Option>
-                <Select.Option value="SocialEvents">
+                <Select.Option value="Community and Social Events">
                   Community and Social Events
                 </Select.Option>
               </Select>

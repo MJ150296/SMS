@@ -13,6 +13,30 @@ export const fetchAllClasses = createAsyncThunk(
   }
 );
 
+// Async thunk to update class teacher
+export const updateClassTeacher = createAsyncThunk(
+  "allClasses/updateClassTeacher",
+  async ({ classId, teacherId }, { rejectWithValue }) => {
+    // console.log("Class and teacher ID");
+
+    // console.log(classId, teacherId);
+
+    try {
+      const response = await axios.patch(
+        `/api/v1/classes/updateClassTeacher/${classId}`,
+        {
+          classTeacher: teacherId,
+        }
+      );
+      console.log(response.data?.data);
+
+      return response.data?.data; // Assume the updated class is returned
+    } catch (error) {
+      return rejectWithValue(error.response.data); // Handle errors
+    }
+  }
+);
+
 const initialState = {
   classes: null,
   isLoading: false,
@@ -52,6 +76,24 @@ const allClassesSlice = createSlice({
       .addCase(fetchAllClasses.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.error.message; // Capture error message
+      })
+      .addCase(updateClassTeacher.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(updateClassTeacher.fulfilled, (state, action) => {
+        state.isLoading = false;
+        // Find the index of the updated class and replace it
+        const index = state.classes.findIndex(
+          (cls) => cls._id === action.payload._id
+        );
+        if (index !== -1) {
+          state.classes[index] = action.payload; // Update the class
+        }
+      })
+      .addCase(updateClassTeacher.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
       });
   },
 });
