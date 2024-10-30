@@ -23,6 +23,7 @@ import TeacherDetails from "./components/Dashboard/Outlet/Total Teachers/Teacher
 import AdminDetails from "./components/Dashboard/Outlet/Total Admins/AdminDetails.jsx";
 import EventManagement from "./components/Dashboard/Sidebar/Events/EventManagement.jsx";
 import MarkAttendance from "./components/Dashboard/Outlet/Attendance/MarkAttendance.jsx";
+import CalendarComponent from "./components/Dashboard/Sidebar/Calendar/CalendarComponent.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -32,6 +33,7 @@ const router = createBrowserRouter(
         <Route index element={<UserStatistics />} />
         <Route path="school_profile" element={<SchoolProfile />} />
         <Route path="manage_users" element={<ManageUsers />} />
+        <Route path="calendar" element={<CalendarComponent />} />
         <Route path="reports" element={<Reports />} />
         <Route path="events" element={<EventManagement />} />
         <Route path="user_settings" element={<UserSettings />} />

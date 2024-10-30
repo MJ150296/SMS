@@ -4,7 +4,6 @@ import StatisticCard from "./StatisticCard.jsx";
 import { useNavigate } from "react-router-dom";
 import RoleDistributionChart from "./Charts/RoleDistributionChart.jsx";
 import MonthlyRegistrationsChart from "./Charts/MonthlyRegistrationChart.jsx";
-import CalendarComponent from "./Charts/CalendarComponent.jsx";
 import { fetchEvents } from "../../../Redux/slices/eventSlice.js";
 import dayjs from "dayjs";
 
@@ -181,14 +180,9 @@ const UserStatistics = () => {
                 value={currentMonthTotal}
               />
             </div>
-            <div className="flex gap-4 p-5">
-              <div className="w-1/2 p-5">
-                <CalendarComponent />
-              </div>
-              <div className="w-1/2 p-5">
-                <MonthlyRegistrationsChart monthlyData={monthlyData} />
-                <RoleDistributionChart roleCounts={roleCounts} />
-              </div>
+            <div className="grid grid-cols-2 gap-4 p-5">
+              <MonthlyRegistrationsChart monthlyData={monthlyData} />
+              <RoleDistributionChart roleCounts={roleCounts} />
             </div>
           </div>
         );

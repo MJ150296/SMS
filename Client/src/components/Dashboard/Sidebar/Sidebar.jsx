@@ -28,6 +28,12 @@ const Sidebar = () => {
               Dashboard
             </NavLink>
             <NavLink
+              to="/dashboard/calendar"
+              className="block px-4 py-2 hover:bg-gray-700"
+            >
+              Calendar
+            </NavLink>
+            <NavLink
               to="/dashboard/manage_users"
               className="block px-4 py-2 hover:bg-gray-700"
             >
