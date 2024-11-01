@@ -17,6 +17,8 @@ function BreadCrumb() {
     "/dashboard/new_user_registration": "User Registration",
     "/dashboard/user_statistics": "User Statistics",
     "/dashboard/student_details": "Student Details",
+    "/dashboard/attendance": "Attendance",
+    "/dashboard/calendar": "Events Calendar",
   };
 
   // console.log("Mounted Component:", location.pathname);

@@ -27,11 +27,11 @@ function App() {
 
   // Fetch the school profile when the app starts
   useEffect(() => {
-    const fetchData = async () => {
-      await dispatch(fetchSchoolProfile());
+    const fetchData = () => {
+      dispatch(fetchSchoolProfile());
     };
     fetchData();
-  }, [dispatch]);
+  }, []);
 
   // Update local state when schoolProfile changes
   useEffect(() => {

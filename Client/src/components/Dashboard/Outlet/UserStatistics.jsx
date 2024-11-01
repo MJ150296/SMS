@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import StatisticCard from "./StatisticCard.jsx";
 import { useNavigate } from "react-router-dom";
@@ -6,11 +6,17 @@ import RoleDistributionChart from "./Charts/RoleDistributionChart.jsx";
 import MonthlyRegistrationsChart from "./Charts/MonthlyRegistrationChart.jsx";
 import { fetchEvents } from "../../../Redux/slices/eventSlice.js";
 import dayjs from "dayjs";
+import { fetchAllUsers } from "../../../Redux/slices/allUsersSlice.js";
+import { fetchAttendanceSummary } from "../../../Redux/slices/allAttendanceSlice.js";
 
 const UserStatistics = () => {
   const { userInfo } = useSelector((state) => state.user);
 
-  const { users, isLoading, error } = useSelector((state) => state.allUsers);
+  const { users } = useSelector((state) => state.allUsers);
+
+  const { summary, summaryLoading, summaryError } = useSelector(
+    (state) => state.attendance
+  );
 
   const [roleCounts, setRoleCounts] = useState({});
 
@@ -26,9 +32,95 @@ const UserStatistics = () => {
 
   const [activeEvents, setActiveEvents] = useState(0);
 
+  const [overallAttendance, setOverallAttendance] = useState(0);
+
+  const [studentAttendancePercentage, setStudentAttendancePercentage] =
+    useState(0);
+
+  const [teacherAttendancePercentage, setTeacherAttendancePercentage] =
+    useState(0);
+
+  const [adminAttendancePercentage, setAdminAttendancePercentage] = useState(0);
+
+  const attendanceCardRef = useRef(null);
+
+  const [isHoverCardVisible, setIsHoverCardVisible] = useState(false);
+  const [hoverCardPosition, setHoverCardPosition] = useState({
+    top: 0,
+    left: 0,
+  });
+
+  const [currentMonth, setCurrentMonth] = useState(dayjs().format("MMM"));
+
+  const handleMouseEnter = (event) => {
+    setIsHoverCardVisible(true);
+    const rect = attendanceCardRef.current.getBoundingClientRect();
+    setHoverCardPosition({
+      top: rect.bottom + window.scrollY + 10, // Adjust for spacing
+      left: rect.left + window.scrollX,
+    });
+  };
+
+  const handleMouseLeave = () => {
+    setIsHoverCardVisible(false);
+  };
+
   useEffect(() => {
     dispatch(fetchEvents());
+    dispatch(fetchAllUsers());
+    dispatch(fetchAttendanceSummary());
   }, []);
+
+  useEffect(() => {
+    if (summary) {
+      console.log("summary", summary);
+
+      const overallAttendancePercentage =
+        summary.total > 0 ? (summary.totalPresent / summary.total) * 100 : 0;
+
+      setOverallAttendance(overallAttendancePercentage.toFixed(2));
+
+      const studentAttendancePercentage =
+        (summary.student.present /
+          (summary.student.present +
+            summary.student.absent +
+            summary.student.late +
+            summary.student.approved_leave)) *
+        100;
+      setStudentAttendancePercentage(studentAttendancePercentage);
+
+      const teacherAttendancePercentage =
+        (summary.teacher.present /
+          (summary.teacher.present +
+            summary.teacher.absent +
+            summary.teacher.late +
+            summary.teacher.approved_leave)) *
+        100;
+      setTeacherAttendancePercentage(teacherAttendancePercentage);
+
+      const adminAttendancePercentage =
+        (summary.admin.present /
+          (summary.admin.present +
+            summary.admin.absent +
+            summary.admin.late +
+            summary.admin.approved_leave)) *
+        100;
+      setAdminAttendancePercentage(adminAttendancePercentage);
+
+      // console.log(
+      //   "studentAttendancePercentage",
+      //   studentAttendancePercentage,
+      //   teacherAttendancePercentage,
+      //   adminAttendancePercentage
+      // );
+
+      // console.log(
+      //   `Overall Attendance Percentage: ${overallAttendancePercentage.toFixed(
+      //     2
+      //   )}%`
+      // );
+    }
+  }, [summary]);
 
   useEffect(() => {
     if (users && users.length > 0) {
@@ -125,7 +217,7 @@ const UserStatistics = () => {
       setMonthlyData(monthlyData); // For monthly registration chart
       console.log(monthlyData);
     }
-  }, []);
+  }, [users]);
 
   const renderStatistics = () => {
     const navigate = useNavigate();
@@ -167,7 +259,28 @@ const UserStatistics = () => {
                 <StatisticCard title="Admin Members" value={roleCounts.admin} />
               </div>
               <StatisticCard title="Pending Approvals" value="23" />
-              <StatisticCard title="Overall Attendance" value="94%" />
+
+              <div
+                ref={attendanceCardRef}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+                className="cursor-pointer"
+              >
+                <StatisticCard
+                  title={`Overall Attendance (${currentMonth})`}
+                  value={`${overallAttendance}%`}
+                />
+
+                {isHoverCardVisible && (
+                  <div className="absolute bg-white border rounded shadow-lg p-4 z-10">
+                    <h3 className="font-bold">Attendance Percentages</h3>
+                    <p>Students: {studentAttendancePercentage.toFixed(2)}%</p>
+                    <p>Teachers: {teacherAttendancePercentage.toFixed(2)}%</p>
+                    <p>Admins: {adminAttendancePercentage.toFixed(2)}%</p>
+                  </div>
+                )}
+              </div>
+
               <StatisticCard
                 title="Events"
                 value={`${activeEvents?.length || "0"} Ongoing/ ${
@@ -180,6 +293,9 @@ const UserStatistics = () => {
                 value={currentMonthTotal}
               />
             </div>
+
+            {/* DASHBOARD CHARTS  */}
+
             <div className="grid grid-cols-2 gap-4 p-5">
               <MonthlyRegistrationsChart monthlyData={monthlyData} />
               <RoleDistributionChart roleCounts={roleCounts} />

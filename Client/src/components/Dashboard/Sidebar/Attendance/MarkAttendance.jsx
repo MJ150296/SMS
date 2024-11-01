@@ -10,7 +10,8 @@ import {
   Select,
 } from "antd";
 import dayjs from "dayjs";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { addAttendance } from "../../../../Redux/slices/allAttendanceSlice";
 
 const AttendanceMarking = () => {
   const { userInfo } = useSelector((state) => state.user);
@@ -27,11 +28,12 @@ const AttendanceMarking = () => {
   const [selectedDropdownValue, setSelectedDropdownValue] = useState();
   const [studentsList, setStudentsList] = useState();
   const [attendance, setAttendance] = useState({});
-  const [defaultClassSelected, setDefaultClassSelected] = useState();
 
-  const [selectedClassDropdownValue, seteSelectedClassDropdownValue] =
+  const [selectedClassDropdownValue, setSelectedClassDropdownValue] =
     useState();
   const [isClassDropdownVisible, setIsClassDropdownVisible] = useState(false);
+
+  const dispatch = useDispatch();
 
   // Set default dropdown value based on role
 
@@ -106,6 +108,8 @@ const AttendanceMarking = () => {
   // Below useEffect is for superAdmin OR Admin role looged In
   useEffect(() => {
     if (userInfo) {
+      console.log(userInfo.role);
+
       if (userInfo.role === "superAdmin" || userInfo.role === "admin") {
         if (selectedDropdownValue === "admin") {
           if (admins && admins.length > 0 && users && users.length > 0) {
@@ -136,7 +140,7 @@ const AttendanceMarking = () => {
                 (u) => u._id === teacher.userId && u.role === "teacher"
               );
               return {
-                id: teacher.teacherId,
+                id: user._id,
                 name: user ? user.fullName : "Unknown",
               };
             });
@@ -153,6 +157,7 @@ const AttendanceMarking = () => {
     admins,
     selectedDropdownValue,
     selectedClassDropdownValue,
+    selectedDate,
   ]);
 
   useEffect(() => {
@@ -160,7 +165,7 @@ const AttendanceMarking = () => {
     if (studentsList?.length > 0) {
       const initialAttendance = {};
       studentsList?.forEach((student) => {
-        initialAttendance[student.id] = { status: "Present", note: "" };
+        initialAttendance[student.id] = { status: "present", reason: "" };
       });
       setAttendance(initialAttendance);
     }
@@ -177,7 +182,7 @@ const AttendanceMarking = () => {
         ...prev,
         [studentId]: {
           status,
-          reason: status === "approved leave" ? "Approved Leave" : "",
+          reason: status === "approved_leave" ? "Approved Leave" : "",
         },
       }));
     }
@@ -196,7 +201,7 @@ const AttendanceMarking = () => {
   };
 
   const handleClassDropdownChange = (value) => {
-    seteSelectedClassDropdownValue(value);
+    setSelectedClassDropdownValue(value);
   };
 
   const handleModalOk = () => {
@@ -209,8 +214,102 @@ const AttendanceMarking = () => {
   };
 
   const handleSubmit = () => {
-    message.success("Attendance submitted successfully!");
-    console.log("Attendance Data:", { date: selectedDate, attendance });
+    console.log(userInfo.role);
+
+    if (userInfo.role === "superAdmin" || userInfo.role === "admin") {
+      if (selectedDropdownValue === "student") {
+        let classId;
+        if (selectedClassDropdownValue) {
+          const classAndSection = selectedClassDropdownValue.split("-");
+          const classDetail = classes.filter(
+            (classItem) =>
+              classItem.className === classAndSection[0] &&
+              classItem.section === classAndSection[1]
+          );
+          classId = classDetail[0]._id;
+        }
+        const attendanceData = {
+          date: dayjs(selectedDate).format("YYYY-MM-DD"),
+          userRole: "student",
+          attendance,
+          classId,
+        };
+        dispatch(addAttendance(attendanceData))
+          .then(() => {
+            message.success("Attendance submitted successfully!");
+            // Handle success, e.g., show a success message
+          })
+          .catch((error) => {
+            console.error("Error adding attendance:", error);
+            message.error("An error occured");
+            // Handle error, e.g., show an error message
+          });
+      } else if (selectedDropdownValue === "admin") {
+        const attendanceData = {
+          date: dayjs(selectedDate).format("YYYY-MM-DD"),
+          userRole: "admin",
+          attendance,
+        };
+        dispatch(addAttendance(attendanceData))
+          .then((response) => {
+            console.log("Attendance added successfully:", response);
+            message.success("Attendance submitted successfully!");
+            // Handle success, e.g., show a success message
+          })
+          .catch((error) => {
+            console.error("Error adding attendance:", error);
+            message.error("An error occured");
+            // Handle error, e.g., show an error message
+          });
+      } else if (selectedDropdownValue === "teacher") {
+        const attendanceData = {
+          date: dayjs(selectedDate).format("YYYY-MM-DD"),
+          userRole: "teacher",
+          attendance,
+        };
+        dispatch(addAttendance(attendanceData))
+          .then((response) => {
+            console.log("Attendance added successfully:", response);
+            message.success("Attendance submitted successfully!");
+            // Handle success, e.g., show a success message
+          })
+          .catch((error) => {
+            console.error("Error adding attendance:", error);
+            message.error("An error occured");
+            // Handle error, e.g., show an error message
+          });
+      }
+    } else if (userInfo.role === "teacher") {
+      console.log("teacher login");
+      console.log(selectedDropdownValue);
+
+      const classAndSection = selectedDropdownValue.split("-");
+      const classDetail = classes.filter(
+        (classItem) =>
+          classItem.className === classAndSection[0] &&
+          classItem.section === classAndSection[1]
+      );
+      let classId = classDetail[0]._id;
+      const attendanceData = {
+        date: dayjs(selectedDate).format("YYYY-MM-DD"),
+        userRole: "student",
+        attendance,
+        classId,
+      };
+      console.log(attendanceData);
+
+      dispatch(addAttendance(attendanceData))
+        .then((response) => {
+          console.log("Attendance added successfully:", response);
+          message.success("Attendance submitted successfully!");
+          // Handle success, e.g., show a success message
+        })
+        .catch((error) => {
+          console.error("Error adding attendance:", error);
+          message.error("An error occured");
+          // Handle error, e.g., show an error message
+        });
+    }
   };
 
   useEffect(() => {
@@ -304,11 +403,11 @@ const AttendanceMarking = () => {
             actions={[
               <Button
                 type={
-                  attendance[student.id]?.status === "Present"
+                  attendance[student.id]?.status === "present"
                     ? "primary"
                     : "default"
                 }
-                onClick={() => handleAttendance(student.id, "Present")}
+                onClick={() => handleAttendance(student.id, "present")}
               >
                 Present
               </Button>,
@@ -335,11 +434,11 @@ const AttendanceMarking = () => {
               </Button>,
               <Button
                 type={
-                  attendance[student.id]?.status === "approved leave"
+                  attendance[student.id]?.status === "approved_leave"
                     ? "primary"
                     : "default"
                 }
-                onClick={() => handleAttendance(student.id, "approved leave")}
+                onClick={() => handleAttendance(student.id, "approved_leave")}
               >
                 Approved Leave
               </Button>,
@@ -352,7 +451,7 @@ const AttendanceMarking = () => {
                   <>
                     <Tag
                       color={
-                        attendance[student.id].status === "Present"
+                        attendance[student.id].status === "present"
                           ? "green"
                           : attendance[student.id].status === "absent"
                           ? "red"

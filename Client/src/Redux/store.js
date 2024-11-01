@@ -7,6 +7,7 @@ import allClassesReducer from "./slices/classSlice.js";
 import allTeacherReducer from "./slices/allTeacherSlice.js";
 import allAdminReducer from "./slices/allAdminSlice.js";
 import eventReducer from "./slices/eventSlice.js";
+import allAttendanceReducer from "./slices/allAttendanceSlice.js"
 
 export const store = configureStore({
   reducer: {
@@ -18,5 +19,6 @@ export const store = configureStore({
     allTeachers: allTeacherReducer,
     allAdmins: allAdminReducer,
     events: eventReducer,
+    attendance: allAttendanceReducer,
   },
 });

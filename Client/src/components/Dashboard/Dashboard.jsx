@@ -10,6 +10,7 @@ import { fetchAllStudents } from "../../Redux/slices/allStudentSlice.js";
 import { fetchAllClasses } from "../../Redux/slices/classSlice.js";
 import { fetchAllTeachers } from "../../Redux/slices/allTeacherSlice.js";
 import { fetchAllAdmins } from "../../Redux/slices/allAdminSlice.js";
+import { fetchAttendanceSummary } from "../../Redux/slices/allAttendanceSlice.js";
 
 const Dashboard = () => {
   const dispatch = useDispatch();
@@ -21,7 +22,8 @@ const Dashboard = () => {
     dispatch(fetchAllUsers());
     dispatch(fetchAllTeachers());
     dispatch(fetchAllAdmins());
-  }, [dispatch]);
+    dispatch(fetchAttendanceSummary());
+  }, []);
 
   useEffect(() => {
     if (users) {

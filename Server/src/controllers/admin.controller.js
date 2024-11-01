@@ -8,7 +8,7 @@ const getAllAdmins = asyncHandler(async (req, res) => {
     // Fetch all admins from the database
     const admins = await Admin.find({});
 
-    console.log(admins); // Log fetched admins for debugging
+    // console.log(admins); // Log fetched admins for debugging
 
     // Send the admins data as a response
     return res.status(200).json(

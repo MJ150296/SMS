@@ -5,7 +5,7 @@ import { School } from "../models/school.model.js";
 import { uploadToCloudinary } from "../utils/cloudinary.utils.js";
 
 const schoolProfileUpdate = asyncHandler(async (req, res, next) => {
-  console.log("in school profile update");
+  // console.log("in school profile update");
   
   try {
     // Extract and transform the incoming request body
@@ -88,16 +88,16 @@ const schoolProfileUpdate = asyncHandler(async (req, res, next) => {
     if (logoUrl) {
       schoolData.logoUrl = logoUrl;
     }
-    console.log(schoolData);
+    // console.log(schoolData);
 
     const count = await School.countDocuments();
-    console.log(count);
+    // console.log(count);
 
     if (count === 0) {
       // Create the school profile in the database
       const createdSchool = await School.create(schoolData);
 
-      console.log(createdSchool);
+      // console.log(createdSchool);
       if (!createdSchool) {
         return res.status(404).json({ message: "School could not be updated" });
       }
@@ -112,13 +112,13 @@ const schoolProfileUpdate = asyncHandler(async (req, res, next) => {
           )
         );
     } else {
-      console.log("in for updation");
+      // console.log("in for updation");
 
       const sanitizedSchoolData = Object.fromEntries(
         Object.entries(schoolData).filter(([key, value]) => value !== undefined)
       );
 
-      console.log("Sanitised data", sanitizedSchoolData);
+      // console.log("Sanitised data", sanitizedSchoolData);
 
       const school = await School.findOne({});
 
@@ -130,7 +130,7 @@ const schoolProfileUpdate = asyncHandler(async (req, res, next) => {
       school.set(sanitizedSchoolData); // Update fields in memory
       const updatedSchool = await school.save(); // Persist the changes to the database
 
-      console.log("Updated school", updatedSchool);
+      // console.log("Updated school", updatedSchool);
 
       if (!updatedSchool) {
         return res.status(500).json({ message: "School could not be updated" });

@@ -32,7 +32,7 @@ const updateClassTeacher = asyncHandler(async (req, res) => {
   const { classId } = req.params; // Get classId from URL params
   const { classTeacher } = req.body; // Get teacherId from request body
 
-  console.log(classId, "Teacher ID", classTeacher);
+  // console.log(classId, "Teacher ID", classTeacher);
 
   try {
     // Validate input

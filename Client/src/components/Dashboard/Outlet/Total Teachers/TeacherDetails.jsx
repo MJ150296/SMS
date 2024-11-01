@@ -48,7 +48,7 @@ const TeacherDetails = () => {
   const handleUpdateSubmit = async () => {
     if (currentClass && newTeacherId) {
       try {
-        await dispatch(
+        dispatch(
           updateClassTeacher({
             classId: currentClass.classId,
             teacherId: newTeacherId,

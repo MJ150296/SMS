@@ -16,7 +16,7 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
       
       throw new ApiError(401, "Unauthorized request");
     }
-    console.log("token , ", token);
+    // console.log("token , ", token);
     
 
     const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
@@ -25,7 +25,7 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
       throw new ApiError(558, "Decoded token not found")
     }
 
-    console.log(decodedToken?._id);
+    // console.log(decodedToken?._id);
     
     const user = await User.findById(decodedToken?._id).select(
       "-password -refreshToken"
@@ -35,7 +35,7 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
       return new ApiError(401, "Invalid Access Token");
     }
 
-    console.log(user);
+    // console.log(user);
     
 
     req.user = user;

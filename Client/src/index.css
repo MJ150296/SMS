@@ -4,4 +4,19 @@
 
 html, body{
   overflow-x: hidden;
+  overflow-y: scroll;
+}
+
+html::-webkit-scrollbar, body::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for Firefox */
+html, body {
+  scrollbar-width: none;
+}
+
+/* Hide scrollbar for Internet Explorer and Edge */
+html, body {
+  -ms-overflow-style: none;
 }

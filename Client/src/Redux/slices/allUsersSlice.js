@@ -13,7 +13,7 @@ export const fetchAllUsers = createAsyncThunk(
 );
 
 const initialState = {
-  users: null,
+  users: [],
   isLoading: false,
   error: null,
 };
@@ -24,7 +24,7 @@ const allUsersSlice = createSlice({
   reducers: {
     // Existing reducers
     addUser: (state, action) => {
-      state.users.push(action.payload); // Add a new user to the list
+      state.users = [...state.users, action.payload]; // Return a new array
     },
     updateUser: (state, action) => {
       const index = state.users.findIndex(

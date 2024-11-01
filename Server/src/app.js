@@ -30,6 +30,7 @@ import classesRouter from "./routes/classes.routes.js";
 import teachersRouter from "./routes/teachers.routes.js";
 import adminsRouter from "./routes/admins.routes.js";
 import eventsRouter from "./routes/events.routes.js";
+import attendanceRouter from "./routes/attendance.routes.js";
 
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/school", schoolRouter);
@@ -39,5 +40,6 @@ app.use("/api/v1/classes", classesRouter);
 app.use("/api/v1/teachers", teachersRouter);
 app.use("/api/v1/admins", adminsRouter);
 app.use("/api/v1/events", eventsRouter);
+app.use("/api/v1/attendance", attendanceRouter);
 
 export { app };

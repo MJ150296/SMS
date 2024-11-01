@@ -31,7 +31,7 @@ const registerAdmin = asyncHandler(async (req, res) => {
       // You can also add address and other fields here if needed
     });
 
-    console.log("Admin", admin);
+    // console.log("Admin", admin);
 
     // 4. Return success response
     return res.status(201).json(
@@ -82,7 +82,7 @@ const registerTeacher = asyncHandler(async (req, res) => {
     // 3. Generate a unique teacherId (e.g., random or UUID-based)
     const teacherId = `T-${Date.now()}`; // Simple example for generating unique teacherId
 
-    console.log(teacherId);
+    // console.log(teacherId);
 
     // 4. Create a new Teacher record
     const teacher = await Teacher.create({
@@ -223,7 +223,7 @@ const registerStudent = asyncHandler(async (req, res) => {
     classRecord.students.push(student._id);
     await classRecord.save();
 
-    console.log("Student Created", student);
+    // console.log("Student Created", student);
 
     // 9. Return success response
     return res.status(201).json(
