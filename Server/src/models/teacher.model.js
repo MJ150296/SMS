@@ -10,9 +10,22 @@ const teacherSchema = new Schema(
       required: true,
       unique: true, // One-to-one relationship with the User model
     },
+    mobileNumber: {
+      type: String,
+      required: true, // Ensures the field is mandatory
+      match: [/^\d{10}$/, "Mobile number must be a valid 10-digit number"], // Validates a 10-digit number
+    },
+    dateOfBirth: {
+      type: Date,
+      required: true,
+    },
     teacherId: {
       type: String,
       unique: true,
+    },
+    academicYear: {
+      type: String,
+      required: true,
     },
     subjectSpecialization: {
       type: [String], // Array of subjects the teacher handles

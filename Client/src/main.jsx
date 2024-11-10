@@ -24,6 +24,7 @@ import AdminDetails from "./components/Dashboard/Outlet/Total Admins/AdminDetail
 import EventManagement from "./components/Dashboard/Sidebar/Events/EventManagement.jsx";
 import CalendarComponent from "./components/Dashboard/Sidebar/Calendar/CalendarComponent.jsx";
 import AttendanceMarking from "./components/Dashboard/Sidebar/Attendance/MarkAttendance.jsx";
+import FeeStructureSetup from "./components/Dashboard/Sidebar/Fee Structure/FeeStructureSetup.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -42,6 +43,7 @@ const router = createBrowserRouter(
         <Route path="teacher_details" element={<TeacherDetails />} />
         <Route path="admin_details" element={<AdminDetails />} />
         <Route path="attendance" element={<AttendanceMarking />} />
+        <Route path="fee_structure" element={<FeeStructureSetup />} />
       </Route>
     </Route>
   )

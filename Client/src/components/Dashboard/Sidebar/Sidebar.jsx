@@ -58,6 +58,12 @@ const Sidebar = () => {
               Events
             </NavLink>
             <NavLink
+              to="/dashboard/fee_structure"
+              className="block px-4 py-2 hover:bg-gray-700"
+            >
+              Fee Structure
+            </NavLink>
+            <NavLink
               to="/dashboard/school_profile"
               className="block px-4 py-2 hover:bg-gray-700"
             >

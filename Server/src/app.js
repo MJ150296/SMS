@@ -31,6 +31,8 @@ import teachersRouter from "./routes/teachers.routes.js";
 import adminsRouter from "./routes/admins.routes.js";
 import eventsRouter from "./routes/events.routes.js";
 import attendanceRouter from "./routes/attendance.routes.js";
+import feesRouter from "./routes/feeStructure.routes.js";
+import salaryRouter from "./routes/teacherSalaryStructure.route.js";
 
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/school", schoolRouter);
@@ -41,5 +43,7 @@ app.use("/api/v1/teachers", teachersRouter);
 app.use("/api/v1/admins", adminsRouter);
 app.use("/api/v1/events", eventsRouter);
 app.use("/api/v1/attendance", attendanceRouter);
+app.use("/api/v1/fees", feesRouter);
+app.use("/api/v1/salary", salaryRouter);
 
 export { app };

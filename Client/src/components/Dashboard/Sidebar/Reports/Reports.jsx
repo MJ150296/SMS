@@ -1,141 +1,175 @@
-import React, { useState } from 'react';
-import { Row, Col, Select, Button, DatePicker } from 'antd';
+import React, { useEffect, useState } from "react";
+import { Row, Col, Select, Button, DatePicker } from "antd";
+import { useDispatch, useSelector } from "react-redux";
 
 const { Option } = Select;
 
 const ReportsComponent = () => {
-  const [selectedReport, setSelectedReport] = useState('attendance');
+  const [selectedReport, setSelectedReport] = useState(null);
+  const [selectedRole, setSelectedRole] = useState(null);
   const [selectedClass, setSelectedClass] = useState(null);
+  const [selectedGrade, setSelectedGrade] = useState(null);
+  const [selectedSection, setSelectedSection] = useState(null);
+  const [selectedDepartment, setSelectedDepartment] = useState(null);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
 
+  const { userInfo } = useSelector((state) => state.user);
+  const { classes } = useSelector((state) => state.allClasses);
+
+  const dispatch = useDispatch();
+
   const handleReportTypeChange = (value) => {
     setSelectedReport(value);
-    setSelectedClass(null); // Reset class selection when report type changes
+    setSelectedRole(null);
+    setSelectedClass(null);
+    setSelectedGrade(null);
+    setSelectedSection(null);
+    setSelectedDepartment(null);
   };
 
-  const handleClassChange = (value) => {
-    setSelectedClass(value);
+  const handleRoleChange = (value) => {
+    setSelectedRole(value);
+    setSelectedClass(null);
+    setSelectedGrade(null);
+    setSelectedSection(null);
+    setSelectedDepartment(null);
   };
 
-  const fetchChartData = () => {
-    // Logic to fetch chart data based on selectedReport, selectedClass, startDate, and endDate
-    console.log('Fetching data for:', {
-      report: selectedReport,
-      class: selectedClass,
-      startDate,
-      endDate,
-    });
+
+  // const fetchChartData = () => {
+  //   if (startDate && endDate && endDate.isAfter(startDate)) {
+  //     console.log("Fetching data for:", {
+  //       report: selectedReport,
+  //       role: selectedRole,
+  //       class: selectedClass,
+  //       startDate: startDate ? startDate.format("YYYY-MM-DD") : null,
+  //       endDate: endDate ? endDate.format("YYYY-MM-DD") : null,
+  //     });
+
+  //     if (report === "attendance" && role === "admin") {
+  //       dispatch(fetchPaginatedAttendance());
+  //     }
+  //   }
+  // };
+
+  const fetchReports = () => {
+    fetchChartData();
   };
 
-  // Sub-options based on the selected report
-  const renderSubOptions = () => {
-    switch (selectedReport) {
-      case 'attendance':
-        return (
-          <Select
-            placeholder="Select Class"
-            onChange={handleClassChange}
-            style={{ width: 150 }}
-          >
-            <Option value="class-1">Class 1</Option>
-            <Option value="class-2">Class 2</Option>
-            <Option value="class-3">Class 3</Option>
-            {/* Add more classes as needed */}
-          </Select>
-        );
-      case 'fees':
-        return (
-          <Select
-            placeholder="Select Fee Type"
-            onChange={handleClassChange}
-            style={{ width: 150 }}
-          >
-            <Option value="tuition">Tuition Fees</Option>
-            <Option value="library">Library Fees</Option>
-            <Option value="sports">Sports Fees</Option>
-          </Select>
-        );
-      case 'performance':
-        return (
-          <Select
-            placeholder="Select Subject"
-            onChange={handleClassChange}
-            style={{ width: 150 }}
-          >
-            <Option value="math">Mathematics</Option>
-            <Option value="science">Science</Option>
-            <Option value="english">English</Option>
-          </Select>
-        );
-      case 'events':
-        return (
-          <Select
-            placeholder="Select Event Type"
-            onChange={handleClassChange}
-            style={{ width: 150 }}
-          >
-            <Option value="sports">Sports Day</Option>
-            <Option value="annual">Annual Day</Option>
-            <Option value="field-trip">Field Trip</Option>
-          </Select>
-        );
-      case 'discipline':
-        return (
-          <Select
-            placeholder="Select Discipline Type"
-            onChange={handleClassChange}
-            style={{ width: 150 }}
-          >
-            <Option value="violations">Violations</Option>
-            <Option value="awards">Awards</Option>
-            <Option value="warnings">Warnings</Option>
-          </Select>
-        );
-      default:
-        return null;
-    }
+  // Role-based report options
+  const reportOptionsByRole = {
+    superAdmin: [
+      { value: "attendanceOverview", label: "Attendance Overview" },
+      { value: "financialReports", label: "Financial Reports" },
+      { value: "performanceAnalytics", label: "Performance Analytics" },
+      { value: "eventManagement", label: "Event Management" },
+      {
+        value: "behavioralDisciplinary",
+        label: "Behavioral and Disciplinary Analysis",
+      },
+      { value: "resourceUsage", label: "Resource Usage" },
+      { value: "teacherStaffReports", label: "Teacher and Staff Reports" },
+      { value: "systemHealth", label: "System Health and Data Analytics" },
+    ],
+    admin: [
+      {
+        value: "attendanceDepartment",
+        label: "Attendance by Department/Class",
+      },
+      { value: "feeCollectionGrade", label: "Fee Collection by Grade" },
+      { value: "disciplinaryReports", label: "Disciplinary Reports" },
+      { value: "classPerformance", label: "Class Performance Reports" },
+      { value: "eventReports", label: "Event Reports" },
+    ],
+    teacher: [
+      {
+        value: "classAttendancePatterns",
+        label: "Class Attendance & Patterns",
+      },
+      { value: "studentPerformance", label: "Student Performance Reports" },
+      { value: "classDisciplinary", label: "Disciplinary Actions for Class" },
+      {
+        value: "assignmentCompletion",
+        label: "Homework & Assignment Completion",
+      },
+      {
+        value: "parentTeacherMeetings",
+        label: "Parent-Teacher Meeting Records",
+      },
+    ],
+    student: [
+      { value: "personalAttendance", label: "Personal Attendance" },
+      { value: "academicPerformance", label: "Academic Performance" },
+      {
+        value: "behavioralDisciplinary",
+        label: "Behavioral & Disciplinary Actions",
+      },
+      { value: "upcomingEvents", label: "Upcoming Events and Deadlines" },
+      { value: "libraryUsage", label: "Library & Resource Usage" },
+    ],
+  };
+
+  const renderReportOptions = () => {
+    const options = reportOptionsByRole[userInfo?.role] || [];
+    return options.map((option) => (
+      <Option key={option.value} value={option.value}>
+        {option.label}
+      </Option>
+    ));
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      {/* <h2>Reports</h2> */}
-      <Row gutter={16}>
+    <div className="p-5">
+      <Row gutter={[16, 16]} align="middle" wrap={true}>
         <Col>
           <Select
-            defaultValue="attendance"
+            placeholder="Select Report"
             onChange={handleReportTypeChange}
-            style={{ width: 150 }}
+            className="w-52"
           >
-            <Option value="attendance">Attendance</Option>
-            <Option value="fees">Fees Collection</Option>
-            <Option value="performance">Performance</Option>
-            <Option value="events">Events</Option>
-            <Option value="discipline">Disciplinary Reports</Option>
+            {renderReportOptions()}
           </Select>
         </Col>
+
         <Col>
-          {renderSubOptions()} {/* Render sub-options based on selected report */}
+          <Select
+            placeholder="Select Role"
+            onChange={handleRoleChange}
+            className="w-40"
+            value={selectedRole}
+          >
+            <Option value="admin">Admin</Option>
+            <Option value="teacher">Teacher</Option>
+            <Option value="student">Student</Option>
+          </Select>
         </Col>
+
         <Col>
           <DatePicker
             placeholder="Start Date"
             onChange={setStartDate}
-            style={{ width: 200, marginRight: 8 }}
+            className="w-52 mr-2"
           />
+        </Col>
+
+        <Col>
           <DatePicker
             placeholder="End Date"
             onChange={setEndDate}
-            style={{ width: 200 }}
+            className="w-52"
+            disabledDate={(current) =>
+              startDate && current && current.isBefore(startDate, "day")
+            }
           />
         </Col>
+
         <Col>
-          <Button type="primary" onClick={fetchChartData}>
+          <Button type="primary" onClick={fetchReports}>
             Generate Report
           </Button>
         </Col>
       </Row>
-      {/* Below this would be the filtered/sorted chart */}
     </div>
   );
 };

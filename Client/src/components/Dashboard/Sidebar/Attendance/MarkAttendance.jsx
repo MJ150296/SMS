@@ -52,6 +52,13 @@ const AttendanceMarking = () => {
     }
   }, [userInfo]);
 
+  useEffect(() => {
+    console.log("classes", classes);
+    console.log("teachers", teachers);
+    console.log("admins", admins);
+    console.log("students", students);
+  }, [classes, teachers, admins, students])
+
   const handleStudentListFromSelectedClass = (selectedClassDropdownValue) => {
     if (selectedClassDropdownValue) {
       // console.log("selectedClass", selectedClassDropdownValue);

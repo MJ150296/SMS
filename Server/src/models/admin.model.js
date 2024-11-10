@@ -16,6 +16,35 @@ const adminSchema = new Schema(
       required: true,
       trim: true,
     },
+    mobileNumber: {
+      type: String,
+      required: true, // Ensures the field is mandatory
+      match: [/^\d{10}$/, "Mobile number must be a valid 10-digit number"], // Validates a 10-digit number
+    },
+    dateOfBirth: {
+      type: Date,
+      required: true,
+    },
+    adminId: {
+      type: String,
+      unique: true,
+    },
+    academicYear: {
+      type: String,
+      required: true,
+    },
+    employmentType: {
+      type: String,
+      enum: ["Permanent", "Contract"],
+      required: true,
+      trim: true,
+    },
+    accessLevel: {
+      type: String,
+      enum: ["Standard", "Managerial"],
+      required: true,
+      trim: true,
+    },
     address: {
       street: { type: String, trim: true },
       city: { type: String, trim: true },

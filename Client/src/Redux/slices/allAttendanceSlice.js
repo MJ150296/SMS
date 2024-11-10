@@ -26,9 +26,9 @@ export const fetchAttendanceSummary = createAsyncThunk(
 // Async thunk to fetch paginated attendance data for detailed reports
 export const fetchPaginatedAttendance = createAsyncThunk(
   "attendance/fetchPaginated",
-  async ({ page, dateRange }) => {
+  async ({ page, startDate, endDate }) => {
     const response = await axios.get("/api/v1/attendance/paginated", {
-      params: { page, startDate: dateRange.start, endDate: dateRange.end },
+      params: { page, startDate, endDate },
     });
     return response.data; // Expecting paginated data and totalPages from backend
   }

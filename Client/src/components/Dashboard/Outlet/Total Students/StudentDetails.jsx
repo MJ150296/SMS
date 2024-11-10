@@ -17,7 +17,12 @@ const StudentDetails = () => {
   const [classTeacherUserProfile, setClassTeacherUserProfile] = useState(null);
 
   const handleUserSelect = (user) => {
+    console.log("students", students);
+
     const student = students?.find((student) => student.userId === user._id);
+
+    console.log("student", student);
+
     setSelectedStudent(student || null);
 
     const selectedClass = classes?.find(
@@ -29,13 +34,13 @@ const StudentDetails = () => {
     console.log("selected student", student);
 
     const classTeacher = teachers?.find(
-      (teacher) => teacher._id === selectedClass.classTeacher
+      (teacher) => teacher._id === selectedClass?.classTeacher
     );
     setClassTeacherDetails(classTeacher);
     console.log("class teacher", classTeacher);
 
     const classTeacherUserProfile = users?.find(
-      (user) => user._id === classTeacher.userId
+      (user) => user._id === classTeacher?.userId
     );
     setClassTeacherUserProfile(classTeacherUserProfile);
 
@@ -53,12 +58,12 @@ const StudentDetails = () => {
   const studentInfo =
     selectedUser && selectedStudent
       ? [
-          { key: 1, field: "Student Name", value: selectedUser.fullName },
-          { key: 2, field: "Student ID", value: selectedStudent.studentId },
+          { key: 1, field: "Student Name", value: selectedUser?.fullName },
+          { key: 2, field: "Student ID", value: selectedStudent?.studentId },
           {
             key: 3,
             field: "Class & Section",
-            value: `${selectedClass.className || ""} - ${
+            value: `${selectedClass?.className || ""} - ${
               selectedStudent.section
             }`,
           },
@@ -66,7 +71,7 @@ const StudentDetails = () => {
           {
             key: 5,
             field: "Class Teacher",
-            value: classTeacherUserProfile.fullName || "",
+            value: classTeacherUserProfile?.fullName || "",
           },
           {
             key: 6,
@@ -123,7 +128,10 @@ const StudentDetails = () => {
           title={
             <div className="w-full flex justify-start items-center">
               <div className="w-1/3">
-                <SearchWithSuggestions onUserSelect={handleUserSelect} role="student"/>
+                <SearchWithSuggestions
+                  onUserSelect={handleUserSelect}
+                  role="student"
+                />
               </div>
               {/* <span>Student Basic Information</span> */}
             </div>
