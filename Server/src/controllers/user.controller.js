@@ -5,6 +5,7 @@ import { User } from "../models/user.model.js";
 import bcrypt from "bcrypt";
 import { NODE_ENV } from "../constants.js";
 import { uploadToCloudinary } from "../utils/cloudinary.utils.js";
+import dayjs from "dayjs";
 
 const generateAccessAndRefereshTokens = async (userId) => {
   try {
@@ -103,6 +104,8 @@ const loginUser = asyncHandler(async (req, res) => {
       "Internal Server Error, Unable to fetch logged in user"
     );
   }
+
+  loggedInUser.lastLogin = dayjs();
 
   const options = {
     httpOnly: true,

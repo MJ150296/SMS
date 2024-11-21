@@ -4,8 +4,14 @@ import AdminRegistrationForm from "./AdminRegistrationForm";
 import TeacherRegistrationForm from "./TeacherRegistrationForm";
 import StudentRegistrationForm from "./StudentRegistrationForm";
 import axios from "axios";
+import { useDispatch } from "react-redux";
+import { fetchAllTeachers } from "../../../../Redux/slices/allTeacherSlice.js";
+import { fetchAllAdmins } from "../../../../Redux/slices/allAdminSlice.js";
+import { fetchAllStudents } from "../../../../Redux/slices/allStudentSlice.js";
 
 const UserRegistration = () => {
+  const dispatch = useDispatch();
+
   const [activeTab, setActiveTab] = useState("1"); // Track active tab
   const [formData, setFormData] = useState({}); // Store form data for submission
 
@@ -20,6 +26,9 @@ const UserRegistration = () => {
       console.log("Admin Data:", formData);
       try {
         const response = await axios.post("/api/v1/register/admin", formData);
+        message.success("Registration successful!");
+
+        dispatch(fetchAllAdmins());
       } catch (error) {
         console.log("error in handlesubmit admin register", error);
         return;
@@ -30,6 +39,8 @@ const UserRegistration = () => {
       try {
         const response = await axios.post("/api/v1/register/teacher", formData);
         console.log(response?.data);
+        message.success("Registration successful!");
+        dispatch(fetchAllTeachers());
       } catch (error) {
         console.log("error in handlesubmit teacher register", error);
         return;
@@ -86,13 +97,15 @@ const UserRegistration = () => {
           },
         });
         console.log("Response:", response);
+
+        message.success("Registration successful!");
+
+        dispatch(fetchAllStudents());
       } catch (error) {
         console.log("Error in handlesubmit student register", error);
         return;
       }
     }
-
-    message.success("Registration successful!");
     setFormData({}); // Clear form data after submission
   };
 

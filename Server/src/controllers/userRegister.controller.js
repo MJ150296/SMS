@@ -12,6 +12,9 @@ import SalaryStructure from "../models/Fee Model/teacherSalaryStructure.model.js
 import TeacherSalary from "../models/Fee Model/teacher salary models/teacherSalary.model.js";
 import AdminSalaryStructure from "../models/Fee Model/adminSalaryStructureSchema.model.js";
 import AdminSalary from "../models/Fee Model/admin salary models/adminSalary.model.js";
+import FeePayment from "../models/Payment Model/feePayment.model.js";
+import dayjs from "dayjs";
+import SalaryPayment from "../models/Payment Model/salaryPayment.model.js";
 
 const registerAdmin = asyncHandler(async (req, res) => {
   try {
@@ -264,6 +267,27 @@ const registerAdmin = asyncHandler(async (req, res) => {
 
     console.log("adminSalaryData", adminSalaryData);
 
+    const adminSalaryPayment = await SalaryPayment.create({
+      salaryId: adminSalaryData._id,
+      userId: user._id,
+      amount: adminSalaryData.totalPayable,
+      payPeriod: "monthly",
+      status: "pending",
+      transactionId: "123abc",
+      paymentMethod: "cash",
+      taxDeductions: 100,
+      netSalary: adminSalaryData.totalPayable,
+    });
+
+    if (!adminSalaryPayment) {
+      throw new ApiError(
+        400,
+        "Unable to create admin salary payment in userRegistration controller function"
+      );
+    }
+
+    console.log("adminSalaryPayment", adminSalaryPayment);
+
     // 4. Return success response
     return res.status(201).json(
       new ApiResponse(201, {
@@ -359,6 +383,10 @@ const registerTeacher = asyncHandler(async (req, res) => {
     //   address,
     //   mobileNumber
     // );
+
+    if (!user) {
+      throw new ApiError(402, "Unable to create User");
+    }
 
     // 4. Create a new Teacher record
     const teacher = await Teacher.create({
@@ -551,11 +579,45 @@ const registerTeacher = asyncHandler(async (req, res) => {
 
     console.log("teacherSalaryData", teacherSalaryData);
 
+    const createdTeacherSalaryData = await TeacherSalary.findById(
+      teacherSalaryData._id
+    );
+
+    if (!createdTeacherSalaryData) {
+      return new ApiError(
+        400,
+        "Teacher salary data not created in userRegister controller"
+      );
+    }
+    console.log("createdTeacherSalaryData", createdTeacherSalaryData);
+
+    const teacherSalaryPayment = await SalaryPayment.create({
+      salaryId: createdTeacherSalaryData._id,
+      userId: user._id,
+      amount: createdTeacherSalaryData.totalPayable,
+      payPeriod: "monthly",
+      status: "pending",
+      transactionId: "123abc",
+      paymentMethod: "cash",
+      taxDeductions: 100,
+      netSalary: createdTeacherSalaryData.totalPayable,
+    });
+
+    if (!teacherSalaryPayment) {
+      throw new ApiError(
+        400,
+        "Unable to create teacher salary payment in userRegistration controller function"
+      );
+    }
+
+    console.log("teacherSalaryPayment", teacherSalaryPayment);
+
     // 5. Return success response
     return res.status(201).json(
       new ApiResponse(201, {
         message: "Teacher registered successfully.",
         teacher: {
+          userId: teacher.userId,
           id: teacher._id,
           fullName: user.fullName,
           email: user.email,
@@ -790,14 +852,22 @@ const registerStudent = asyncHandler(async (req, res) => {
       const feeStructureData = await FeeStructure.find({});
       // console.log("feeStructureData", feeStructureData);
       // Find the fee structure for the current class and academic year
-      const feeStructure = feeStructureData.find(
+      let feeStructure = feeStructureData.filter(
         (fee) => fee.academicYear === "2024-25"
       );
 
-      const baseTuitionFee = feeStructure.baseTuitionFee || 0;
+      feeStructure = feeStructure[0];
+      console.log("feeStructureData", feeStructure);
+
+      const baseTuitionFee = feeStructure?.baseTuitionFee || 0;
       // This is here because we want to calculate concession in fee object
 
       if (feeStructure) {
+        console.log(
+          "feeStructure.concessions.siblingDiscount",
+          feeStructure.concessions
+        );
+
         fee = {
           academicYear: feeStructure.academicYear,
           department: feeStructure.department || "Unknown", // You can set a default if department is null
@@ -918,6 +988,34 @@ const registerStudent = asyncHandler(async (req, res) => {
     });
 
     // console.log("studentFee", studentFee);
+
+    if (!studentFee) {
+      throw new ApiError(
+        400,
+        "Unable to create student Fee in userResgister.controller"
+      );
+    }
+    const studentFeePayment = await FeePayment.create({
+      feeId: studentFee._id,
+      studentId: student._id,
+      amount: totalFeeAmount,
+      overDueAmount: 100,
+      dueDate: dayjs().add(1, "month").startOf("month").format("YYYY-MM-DD"), // Format to 'YYYY-MM-DD' if needed
+      status: "unpaid",
+      transactionId: "12345",
+      paymentMethod: "cash",
+      receipt: "reciept url or file path",
+      remarks: "Unpaid till now",
+    });
+
+    if (!studentFeePayment) {
+      throw new ApiError(
+        400,
+        "Unable to create Student fee payment in userRegister controller"
+      );
+    }
+
+    console.log("studentFeePayment", studentFeePayment);
 
     // 8. Add the student to the class's students array
     classRecord.students.push(student._id);

@@ -1,8 +1,19 @@
-import { Tabs, Card, Table } from "antd";
+import {
+  Tabs,
+  Card,
+  Table,
+  Descriptions,
+  Button,
+  Modal,
+  Form,
+  Select,
+  Input,
+} from "antd";
 import { Line } from "react-chartjs-2";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import SearchWithSuggestions from "./SearchWithSuggestions.jsx";
+import axios from "axios";
 
 const StudentDetails = () => {
   const { users } = useSelector((state) => state.allUsers);
@@ -15,6 +26,19 @@ const StudentDetails = () => {
   const [selectedClass, setSelectedClass] = useState(null);
   const [classTeacherDetails, setClassTeacherDetails] = useState(null);
   const [classTeacherUserProfile, setClassTeacherUserProfile] = useState(null);
+
+  const [feeData, setFeeData] = useState();
+
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
+
+  const showModal = () => setIsModalVisible(true);
+  const closeModal = () => setIsModalVisible(false);
+
+  // Handle payment mode selection
+  const handlePaymentMethodChange = (value) => setSelectedPaymentMethod(value);
+
+  const dispatch = useDispatch();
 
   const handleUserSelect = (user) => {
     console.log("students", students);
@@ -48,6 +72,19 @@ const StudentDetails = () => {
 
     setSelectedUser(user || null);
     console.log("Selected User:", user);
+
+    if (student) {
+      const fetchStudentFeeDetails = async () => {
+        const response = await axios.get(
+          `/api/v1/fees/payment/fetch_fee_payment/${student._id}`
+        );
+        console.log(response?.data?.data);
+
+        setFeeData(response?.data?.data);
+        // console.log(response?.data);
+      };
+      fetchStudentFeeDetails();
+    }
   };
 
   const columns = [
@@ -216,11 +253,185 @@ const StudentDetails = () => {
       label: "Fee Details",
       key: "4",
       children: (
-        <Card title="Fee Payment Status">
-          {selectedStudent ? (
+        <Card title="Fee Payment Status" style={{ marginBottom: 16 }}>
+          {feeData ? (
             <>
-              <p>Status: {selectedStudent?.feeStatus || "Fee status"}</p>
-              <p>Due Amount: {selectedStudent.dueAmount || "Due amount"}</p>
+              {/* Payment Status */}
+              <>
+                <Card
+                  style={{
+                    marginTop: 8,
+                    marginBottom: 16,
+                    position: "relative",
+                  }}
+                  title="Fee Details"
+                  extra={
+                    <Button type="primary" onClick={showModal}>
+                      Pay Now
+                    </Button>
+                  }
+                >
+                  <p>
+                    Status:{" "}
+                    {feeData?.studentFeePaymentDetails[0]?.status || "N/A"}
+                  </p>
+                  <p>
+                    Due Amount: ₹
+                    {feeData?.studentFeePaymentDetails[0]?.overDueAmount ||
+                      "N/A"}
+                  </p>
+                  <p>
+                    Remarks:{" "}
+                    {feeData?.studentFeePaymentDetails[0]?.remarks || "N/A"}
+                  </p>
+                </Card>
+
+                {/* Modal for Payment */}
+                <Modal
+                  title="Complete Payment"
+                  open={isModalVisible}
+                  onOk={closeModal}
+                  onCancel={closeModal}
+                  okText="Submit Payment"
+                >
+                  <Form layout="vertical">
+                    {/* Payment Method Dropdown */}
+                    <Form.Item label="Select Payment Method" required>
+                      <Select
+                        placeholder="Choose a payment method"
+                        onChange={handlePaymentMethodChange}
+                      >
+                        <Select.Option value="cash">Cash</Select.Option>
+                        <Select.Option value="card">
+                          Credit/Debit Card
+                        </Select.Option>
+                        <Select.Option value="upi">UPI</Select.Option>
+                        <Select.Option value="bank">
+                          Bank Transfer
+                        </Select.Option>
+                      </Select>
+                    </Form.Item>
+
+                    {/* Conditional Fields based on Payment Method */}
+                    {selectedPaymentMethod === "card" && (
+                      <>
+                        <Form.Item label="Card Number" required>
+                          <Input
+                            placeholder="Enter card number"
+                            maxLength={16}
+                          />
+                        </Form.Item>
+                        <Form.Item label="Card Holder Name" required>
+                          <Input placeholder="Enter name on card" />
+                        </Form.Item>
+                        <Form.Item label="Expiry Date" required>
+                          <Input placeholder="MM/YY" maxLength={5} />
+                        </Form.Item>
+                        <Form.Item label="CVV" required>
+                          <Input.Password placeholder="CVV" maxLength={3} />
+                        </Form.Item>
+                      </>
+                    )}
+
+                    {selectedPaymentMethod === "upi" && (
+                      <Form.Item label="UPI ID" required>
+                        <Input placeholder="Enter UPI ID (e.g., user@upi)" />
+                      </Form.Item>
+                    )}
+
+                    {selectedPaymentMethod === "bank" && (
+                      <>
+                        <Form.Item label="Account Number" required>
+                          <Input placeholder="Enter bank account number" />
+                        </Form.Item>
+                        <Form.Item label="IFSC Code" required>
+                          <Input placeholder="Enter IFSC code" />
+                        </Form.Item>
+                      </>
+                    )}
+
+                    {selectedPaymentMethod === "cash" && (
+                      <p>
+                        Please proceed to the school office to complete your
+                        cash payment.
+                      </p>
+                    )}
+                  </Form>
+                </Modal>
+              </>
+
+              {/* Overall Fee Breakdown */}
+              <Descriptions title="Fee Breakdown" bordered column={2}>
+                <Descriptions.Item label="Academic Year">
+                  {feeData?.studentFeeDetails[0]?.academicYear || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Department">
+                  {feeData?.studentFeeDetails[0]?.department || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Base Tuition Fee">
+                  ₹{feeData?.studentFeeDetails[0]?.baseTuitionFee || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Concessions">
+                  ₹
+                  {Object.values(
+                    feeData?.studentFeeDetails[0]?.concessions || {}
+                  ).reduce((acc, val) => acc + val, 0) || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Counseling Fee">
+                  ₹{feeData?.studentFeeDetails[0]?.counselingFee || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Digital Resources Fee">
+                  ₹{feeData?.studentFeeDetails[0]?.digitalResourcesFee || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Exam Fees">
+                  ₹{feeData?.studentFeeDetails[0]?.examFees || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Sports Facility Fee">
+                  ₹{feeData?.studentFeeDetails[0]?.sportsFacilityFee || "N/A"}
+                </Descriptions.Item>
+                {/* Add more fee fields as needed */}
+                <Descriptions.Item label="Transportation Fee">
+                  ₹{feeData?.studentFeeDetails[0]?.transportationFee || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Total Fee Due">
+                  ₹{feeData?.studentFeePaymentDetails[0]?.amount || "N/A"}
+                </Descriptions.Item>
+              </Descriptions>
+
+              {/* Payment History Table */}
+              <Card title="Payment History" style={{ marginTop: 16 }}>
+                <Table
+                  dataSource={feeData?.studentFeePaymentDetails || []}
+                  rowKey="_id"
+                  pagination={false}
+                  columns={[
+                    {
+                      title: "Transaction ID",
+                      dataIndex: "transactionId",
+                      key: "transactionId",
+                    },
+                    {
+                      title: "Amount",
+                      dataIndex: "amount",
+                      key: "amount",
+                      render: (amount) => `₹${amount}`,
+                    },
+                    {
+                      title: "Method",
+                      dataIndex: "paymentMethod",
+                      key: "paymentMethod",
+                    },
+                    { title: "Status", dataIndex: "status", key: "status" },
+                    {
+                      title: "Due Date",
+                      dataIndex: "dueDate",
+                      key: "dueDate",
+                      render: (date) => new Date(date).toLocaleDateString(),
+                    },
+                    { title: "Remarks", dataIndex: "remarks", key: "remarks" },
+                  ]}
+                />
+              </Card>
             </>
           ) : (
             <p>No student selected.</p>

@@ -10,7 +10,7 @@ const getAllClasses = asyncHandler(async (req, res) => {
     const classes = await Class.find({});
 
     if (!classes || classes.length === 0) {
-      throw new ApiError(404, "Classes not found in the controller function");
+      return new ApiError(404, "Classes not found in the controller function");
     }
 
     // Send the class data as a response

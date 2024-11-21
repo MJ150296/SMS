@@ -13,6 +13,7 @@ const AdminDetails = () => {
   const [adminSchoolDetails, setAdminSchoolDetails] = useState(null);
 
   const handleUserSelect = (user) => {
+
     const admin = admins?.find((admin) => admin.userId === user._id);
     setSelectedAdmin(admin || null);
 

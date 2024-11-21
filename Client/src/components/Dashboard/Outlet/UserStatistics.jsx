@@ -8,6 +8,7 @@ import { fetchEvents } from "../../../Redux/slices/eventSlice.js";
 import dayjs from "dayjs";
 import { fetchAllUsers } from "../../../Redux/slices/allUsersSlice.js";
 import { fetchAttendanceSummary } from "../../../Redux/slices/allAttendanceSlice.js";
+import axios from "axios";
 
 const UserStatistics = () => {
   const { userInfo } = useSelector((state) => state.user);
@@ -61,6 +62,34 @@ const UserStatistics = () => {
     });
   };
 
+  useEffect(() => {
+    /////////////////////////////  TO ASSIGN MONTHLY FEES AND SALARY TO STUDENTS AND TEACHERS
+    if (
+      userInfo &&
+      (userInfo?.role === "superAdmin" || userInfo.role === "admin")
+    ) {
+      const lastLogin = userInfo.lastLogin;
+
+      // Get the start of the current month
+      const startOfCurrentMonth = dayjs().startOf("month");
+
+      // Check if last login is before the start of the current month
+      if (dayjs(lastLogin).isBefore(startOfCurrentMonth)) {
+        console.log("first login this month");
+        const feeResponse = axios.get(
+          // "/api/v1/assignMonthlyFeeAndSalary/assignMonthlyFandS"
+          "/api/v1/fees/payment/add_fee_payment"
+        );
+        const salaryResponse = axios.get(
+          // "/api/v1/assignMonthlyFeeAndSalary/assignMonthlyFandS"
+          "/api/v1/salary/payment/add_salary_payment"
+        );
+      } else {
+        console.log("NOT FIRST LOGIN OF THE MONTH");
+      }
+    }
+  }, []);
+
   const handleMouseLeave = () => {
     setIsHoverCardVisible(false);
   };
@@ -72,7 +101,7 @@ const UserStatistics = () => {
   }, []);
 
   useEffect(() => {
-    if (summary) {
+    if (summary?.total > 0) {
       console.log("summary", summary);
 
       const overallAttendancePercentage =

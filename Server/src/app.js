@@ -31,8 +31,8 @@ import teachersRouter from "./routes/teachers.routes.js";
 import adminsRouter from "./routes/admins.routes.js";
 import eventsRouter from "./routes/events.routes.js";
 import attendanceRouter from "./routes/attendance.routes.js";
-import feesRouter from "./routes/feeStructure.routes.js";
-import salaryRouter from "./routes/teacherSalaryStructure.route.js";
+import feesRouter from "./routes/allFeeRelated.routes.js";
+import salaryRouter from "./routes/allSalaryRelated.routes.js";
 
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/school", schoolRouter);

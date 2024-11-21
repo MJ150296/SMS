@@ -53,11 +53,11 @@ const AttendanceMarking = () => {
   }, [userInfo]);
 
   useEffect(() => {
-    console.log("classes", classes);
     console.log("teachers", teachers);
     console.log("admins", admins);
     console.log("students", students);
-  }, [classes, teachers, admins, students])
+    console.log("classes", classes);
+  }, [classes, students]);
 
   const handleStudentListFromSelectedClass = (selectedClassDropdownValue) => {
     if (selectedClassDropdownValue) {
@@ -67,19 +67,19 @@ const AttendanceMarking = () => {
       // console.log("class", onlyClass, "section", onlySection);
 
       // Find the selected class details
-      const classDetails = classes.filter(
+      const classDetails = classes?.filter(
         (classItem) =>
           classItem.className === onlyClass && classItem.section === onlySection
       );
 
       // Check if classDetails has any entries
-      if (classDetails.length > 0) {
+      if (classDetails?.length > 0) {
         const studentsIdOfClass = classDetails[0].students;
         // console.log("classDetails", classDetails);
         // console.log("studentsIdOfClass", studentsIdOfClass);
 
         // Get student details of the specific class
-        const studentDetailsOfAClass = students.filter((student) =>
+        const studentDetailsOfAClass = students?.filter((student) =>
           studentsIdOfClass.includes(student._id)
         );
         // console.log("studentDetailsOfAClass", studentDetailsOfAClass);
@@ -90,7 +90,7 @@ const AttendanceMarking = () => {
         );
 
         // Get user details for each student in the class
-        const studentUserDetails = users.filter((user) =>
+        const studentUserDetails = users?.filter((user) =>
           studentUserIds.has(user._id)
         );
         // console.log("studentUserDetails", studentUserDetails);
@@ -228,7 +228,7 @@ const AttendanceMarking = () => {
         let classId;
         if (selectedClassDropdownValue) {
           const classAndSection = selectedClassDropdownValue.split("-");
-          const classDetail = classes.filter(
+          const classDetail = classes?.filter(
             (classItem) =>
               classItem.className === classAndSection[0] &&
               classItem.section === classAndSection[1]
@@ -291,7 +291,7 @@ const AttendanceMarking = () => {
       console.log(selectedDropdownValue);
 
       const classAndSection = selectedDropdownValue.split("-");
-      const classDetail = classes.filter(
+      const classDetail = classes?.filter(
         (classItem) =>
           classItem.className === classAndSection[0] &&
           classItem.section === classAndSection[1]

@@ -33,6 +33,8 @@ const CalendarComponent = () => {
           organizer: event.organizer,
           description: event.description,
         });
+
+        console.log(eventsByDate);
       }
     });
 

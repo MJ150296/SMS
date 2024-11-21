@@ -1,6 +1,6 @@
 // src/components/Dashboard.js
 
-import React, { createContext, useEffect, useState } from "react";
+import React, { createContext, useCallback, useEffect, useState } from "react";
 import Header from "./Header/Header";
 import Sidebar from "./Sidebar/Sidebar";
 import { Outlet } from "react-router-dom";
@@ -15,19 +15,23 @@ import { fetchAttendanceSummary } from "../../Redux/slices/allAttendanceSlice.js
 const Dashboard = () => {
   const dispatch = useDispatch();
 
-  const { users, isLoading, error } = useSelector((state) => state.allUsers);
-  useEffect(() => {
-    dispatch(fetchAllStudents());
-    dispatch(fetchAllClasses());
-    dispatch(fetchAllUsers());
-    dispatch(fetchAllTeachers());
-    dispatch(fetchAllAdmins());
-    dispatch(fetchAttendanceSummary());
-  }, []);
+  const { students } = useSelector((state) => state.allStudents);
+  const { users } = useSelector((state) => state.allUsers);
 
   useEffect(() => {
     if (users) {
-      console.log("All Users", users);
+
+      dispatch(fetchAllUsers());
+      if(students){
+        dispatch(fetchAllClasses());
+      }
+      dispatch(fetchAllStudents());
+
+      dispatch(fetchAttendanceSummary());
+
+      dispatch(fetchAllTeachers());
+
+      dispatch(fetchAllAdmins());
     }
   }, []);
 
