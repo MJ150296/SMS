@@ -1,11 +1,28 @@
-import { Tabs, Card, Table, List, Button, Modal, Select } from "antd";
+import {
+  Tabs,
+  Card,
+  Table,
+  List,
+  Button,
+  Modal,
+  Select,
+  Form,
+  Descriptions,
+  Input,
+} from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import SearchWithSuggestions from "../Total Students/SearchWithSuggestions";
-import { updateClassTeacher } from "../../../../Redux/slices/classSlice.js";
+import {
+  fetchAllClasses,
+  updateClassTeacher,
+} from "../../../../Redux/slices/classSlice.js";
 import { fetchAllTeachers } from "../../../../Redux/slices/allTeacherSlice.js";
+import axios from "axios";
 
 const TeacherDetails = () => {
+  const dispatch = useDispatch();
+
   const { userInfo } = useSelector((state) => state.user);
   const { users } = useSelector((state) => state.allUsers);
   const { teachers } = useSelector((state) => state.allTeachers);
@@ -18,6 +35,9 @@ const TeacherDetails = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [currentClass, setCurrentClass] = useState(null);
   const [newTeacherId, setNewTeacherId] = useState("");
+  const [salaryData, setSalaryData] = useState();
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
+  const [isPayNowModalVisible, setIsPayNowModalVisible] = useState(false);
 
   const handleUserSelect = (user) => {
     console.log("selected user", user);
@@ -35,13 +55,24 @@ const TeacherDetails = () => {
     setTeacherClassDetails(assignedClasses);
 
     setSelectedUser(user || null);
-
-    // if(teacher){
-    //   const fetchTeacherSalary = async() => {
-    //     const response = await axios.get()
-    //   }
-    // }
   };
+
+  useEffect(() => {
+    if (selectedTeacher) {
+      const fetchTeacherSalary = async () => {
+        console.log("teacherID", selectedTeacher._id);
+
+        const response = await axios.get(
+          `/api/v1/salary/payment/fetch_salary_payment/${selectedTeacher._id}`
+        );
+        console.log("fetch teacher payment");
+        console.log(response?.data?.data);
+
+        setSalaryData(response?.data?.data);
+      };
+      fetchTeacherSalary();
+    }
+  }, [selectedTeacher]);
 
   const handleUpdateTeacher = (classItem) => {
     setCurrentClass(classItem);
@@ -64,6 +95,8 @@ const TeacherDetails = () => {
             teacherId: newTeacherId,
           })
         );
+        // dispatch(fetchAllTeachers());
+        // dispatch(fetchAllClasses());
         closeModal(); // Close modal after dispatch
       } catch (error) {
         // Handle error (e.g., show a notification)
@@ -96,6 +129,9 @@ const TeacherDetails = () => {
     }
   }, [classes, teachers, users]);
 
+  const handlePaymentMethodChange = (value) => setSelectedPaymentMethod(value);
+  const showPayNowModal = () => setIsPayNowModalVisible(true);
+  const closePayNowModal = () => setIsPayNowModalVisible(false);
 
   // Define teacherInfo based on selected user and selected teacher
   const teacherInfo =
@@ -201,33 +237,30 @@ const TeacherDetails = () => {
                 }}
                 title="Salary Details"
                 extra={
-                  <Button type="primary" onClick={showModal}>
+                  <Button type="primary" onClick={showPayNowModal}>
                     Pay Now
                   </Button>
                 }
               >
                 <p>
-                  Status:{" "}
-                  {salaryData?.employeeSalaryPaymentDetails[0]?.status || "N/A"}
+                  Status: {salaryData?.salaryPaymentDetails[0]?.status || "N/A"}
                 </p>
                 <p>
-                  Due Amount: ₹
-                  {salaryData?.employeeSalaryPaymentDetails[0]?.overDueAmount ||
-                    "N/A"}
+                  Transaction ID:{" "}
+                  {salaryData?.salaryPaymentDetails[0]?.transactionId || "N/A"}
                 </p>
                 <p>
-                  Remarks:{" "}
-                  {salaryData?.employeeSalaryPaymentDetails[0]?.remarks ||
-                    "N/A"}
+                  Net Salary: ₹
+                  {salaryData?.salaryPaymentDetails[0]?.netSalary || "N/A"}
                 </p>
               </Card>
 
               {/* Modal for Payment */}
               <Modal
                 title="Complete Payment"
-                open={isModalVisible}
-                onOk={closeModal}
-                onCancel={closeModal}
+                open={isPayNowModalVisible}
+                onOk={closePayNowModal}
+                onCancel={closePayNowModal}
                 okText="Submit Payment"
               >
                 <Form layout="vertical">
@@ -291,27 +324,35 @@ const TeacherDetails = () => {
               {/* Salary Breakdown */}
               <Descriptions title="Salary Breakdown" bordered column={2}>
                 <Descriptions.Item label="Base Salary">
-                  ₹{salaryData?.employeeSalaryDetails[0]?.baseSalary || "N/A"}
+                  ₹{salaryData?.salaryDetails[0]?.baseSalary || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Bonuses">
-                  ₹{salaryData?.employeeSalaryDetails[0]?.bonuses || "N/A"}
+                  ₹
+                  {salaryData?.salaryDetails[0]?.bonuses.performanceBonus +
+                    salaryData?.salaryDetails[0]?.bonuses.festivalBonus ||
+                    "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Allowances">
+                  ₹
+                  {salaryData?.salaryDetails[0]?.allowances.houseAllowance +
+                    salaryData?.salaryDetails[0]?.allowances
+                      .transportationAllowance || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Deductions">
-                  ₹{salaryData?.employeeSalaryDetails[0]?.deductions || "N/A"}
-                </Descriptions.Item>
-                <Descriptions.Item label="Tax">
-                  ₹{salaryData?.employeeSalaryDetails[0]?.tax || "N/A"}
+                  ₹
+                  {salaryData?.salaryDetails[0]?.deductions.taxDeduction +
+                    salaryData?.salaryDetails[0]?.deductions.providentFund ||
+                    "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Total Payable Salary">
-                  ₹
-                  {salaryData?.employeeSalaryPaymentDetails[0]?.amount || "N/A"}
+                  ₹{salaryData?.salaryDetails[0]?.totalPayable || "N/A"}
                 </Descriptions.Item>
               </Descriptions>
 
               {/* Payment History Table */}
               <Card title="Payment History" style={{ marginTop: 16 }}>
                 <Table
-                  dataSource={salaryData?.employeeSalaryPaymentDetails || []}
+                  dataSource={salaryData?.salaryPaymentDetails || []}
                   rowKey="_id"
                   pagination={false}
                   columns={[
@@ -334,11 +375,10 @@ const TeacherDetails = () => {
                     { title: "Status", dataIndex: "status", key: "status" },
                     {
                       title: "Payment Date",
-                      dataIndex: "paymentDate",
-                      key: "paymentDate",
+                      dataIndex: "createdAt",
+                      key: "createdAt",
                       render: (date) => new Date(date).toLocaleDateString(),
                     },
-                    { title: "Remarks", dataIndex: "remarks", key: "remarks" },
                   ]}
                 />
               </Card>

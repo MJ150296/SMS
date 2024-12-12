@@ -19,7 +19,7 @@ router.route("/admin_salary_structure").post(verifyJWT, adminSalaryStructure);
 router.route("/payment/add_salary_payment").get(verifyJWT, addSalaryPayment);
 
 router
-  .route("/payment/fetch_salary_payment")
+  .route("/payment/fetch_salary_payment/:teacherId")
   .get(verifyJWT, fetchSalaryPayment);
 
 router

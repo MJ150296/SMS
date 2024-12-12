@@ -64,7 +64,7 @@ const addSalaryPayment = asyncHandler(async (req, res) => {
           const salaryId = teacherSalary._id;
 
           const previousSalaryPayment = await SalaryPayment.findOne({
-            salaryId
+            salaryId,
           })
             .sort({ createdAt: -1 })
             .exec();
@@ -99,7 +99,42 @@ const addSalaryPayment = asyncHandler(async (req, res) => {
     );
   } catch (error) {}
 });
-const fetchSalaryPayment = asyncHandler(async (req, res) => {});
+const fetchSalaryPayment = asyncHandler(async (req, res) => {
+  try {
+    const { teacherId } = req.params;
+
+    // console.log("teacherID", teacherId);
+
+    const salaryDetails = await TeacherSalary.find({ teacherId });
+
+    if (!salaryDetails) {
+      throw new ApiError(
+        400,
+        "Teacher salary not found in salaryPayment controller"
+      );
+    }
+
+    const salaryId = salaryDetails[0]._id;
+
+    const salaryPaymentDetails = await SalaryPayment.find({ salaryId });
+
+    // console.log("salary payment", salaryPaymentDetails);
+
+    return res.status(200).json({
+      statusCode: 200,
+      data: {
+        salaryDetails,
+        salaryPaymentDetails,
+      },
+      message: "Successfully salary detail fetched.",
+    });
+  } catch (error) {
+    throw new ApiError(
+      400,
+      "Unable to fetch salary payment in controller function"
+    );
+  }
+});
 const updateSalaryPayment = asyncHandler(async (req, res) => {});
 
 export { addSalaryPayment, fetchSalaryPayment, updateSalaryPayment };

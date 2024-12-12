@@ -20,11 +20,10 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (users) {
-
       dispatch(fetchAllUsers());
-      if(students){
-        dispatch(fetchAllClasses());
-      }
+
+      dispatch(fetchAllClasses());
+
       dispatch(fetchAllStudents());
 
       dispatch(fetchAttendanceSummary());

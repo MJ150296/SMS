@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Table, Modal } from "antd"; // Still using Ant Design for table and modal
+import { Table, Modal, Button, List, Select, Upload } from "antd"; // Still using Ant Design for table and modal
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { NavLink } from "react-router-dom";
@@ -79,16 +79,118 @@ const ManageUsers = () => {
     },
   ];
 
+  const importOptions = [
+    "Student Profiles",
+    "Teacher Profiles",
+    "Class Assignments",
+    "Attendance Records",
+    "Exam Schedules",
+    "Marks/Grades",
+    "Fee Records",
+    "Event Details",
+    "Parent-Teacher Communication",
+    "Library Data",
+    "Transport Data",
+    "Health Records",
+    "Custom Reports",
+  ];
+
+  const [isImportModalVisible, setIsImportModalVisible] = useState(false);
+  const [selectedOption, setSelectedOption] = useState("");
+  const [uploading, setUploading] = useState(false);
+
+  const uploadProps = {
+    beforeUpload: (file) => {
+      message.success(`${file.name} file selected for upload.`);
+      return false; // Prevent automatic upload
+    },
+  };
+
+  const handleImport = () => {
+    setIsImportModalVisible(true);
+  };
+
+  const handleCancel = () => {
+    setIsImportModalVisible(false);
+  };
+
+  const handleUpload = () => {
+    if (!selectedOption) {
+      message.error("Please select an import option before uploading!");
+      return;
+    }
+    setUploading(true);
+    setTimeout(() => {
+      setUploading(false);
+      message.success("File uploaded successfully!");
+      setIsImportModalVisible(false);
+    }, 2000); // Simulate upload delay
+  };
+
   return (
     <div className="manage-users-dashboard p-4">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">Manage Users</h1>
-        <NavLink
-          to="/dashboard/new_user_registration"
-          className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded shadow-lg"
-        >
-          + Add New User
-        </NavLink>
+        <div className="flex gap-x-3">
+          <div>
+            <button
+              onClick={handleImport}
+              className="bg-green-500 hover:bg-green-600 font-medium text-white py-2 px-4 rounded shadow-lg"
+            >
+              Import Data
+            </button>
+
+            <Modal
+              title="Import Data"
+              open={isImportModalVisible}
+              onCancel={handleCancel}
+              footer={[
+                <Button key="cancel" onClick={handleCancel}>
+                  Cancel
+                </Button>,
+                <Button
+                  key="upload"
+                  type="primary"
+                  loading={uploading}
+                  onClick={handleUpload}
+                >
+                  Upload
+                </Button>,
+              ]}
+            >
+              <div className="mb-4">
+                <p className="text-gray-600">
+                  Select the type of data to import:
+                </p>
+                <Select
+                  placeholder="Select Import Option"
+                  onChange={(value) => setSelectedOption(value)}
+                  className="w-full"
+                >
+                  {importOptions.map((option) => (
+                    <Select.Option key={option} value={option}>
+                      {option}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </div>
+
+              <div className="mb-4">
+                <p className="text-gray-600">Upload your file:</p>
+                <Upload {...uploadProps}>
+                  <Button icon="U">Select File</Button>
+                </Upload>
+              </div>
+            </Modal>
+          </div>
+
+          <NavLink
+            to="/dashboard/new_user_registration"
+            className="bg-green-500 hover:bg-green-600 font-medium text-white py-2 px-4 rounded shadow-lg"
+          >
+            + Add New User
+          </NavLink>
+        </div>
       </div>
 
       <div className="flex space-x-4 mb-4">
